@@ -1,0 +1,15 @@
+Content-type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/css/styles.css">
+<meta http-equiv="refresh" content="1; url=https://j2interactive.atlassian.net/wiki/welcome.action">
+</head>
+<body>
+<table class="headertable">
+<tr><td class="blue"><img src="/images/j2docker-left.png" alt="J2 Logo" class="imgheader"></td></tr>
+<tr><td class="information">System shutting down</td></tr>
+</table>
+</body>
+</html>

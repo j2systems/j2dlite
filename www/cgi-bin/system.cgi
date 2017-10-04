@@ -148,10 +148,13 @@ echo "</table>"
 echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"blue build\"></td></tr></table>"
 
 echo "<table align=\"center\">"
-echo "<tr><td><form action=\"./terminal.cgi\" method=\"POST\"><input type=\"submit\" name=\"TERMINAL\" value=\"Terminal\" class=\"button green\"></td></tr>"
+echo "<tr><td><form action=\"./terminal.cgi\" method=\"POST\"><input type=\"submit\" name=\"TERMINAL\" value=\"Terminal\" class=\"button green\"></form></td></tr>"
 echo "</table>"
-echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"yellow build\"></td></tr></table>"
+echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"red build\"></td></tr></table>"
+echo "<table align=\"right\">"
+echo "<tr><td><form action=\"./poweroff.cgi\"  method=\"POST\"><input type=\"submit\" name=\"SHUTDOWN\" value=\"Power Off\" class=\"button red\"></form></td></tr>"
+echo "</table>"
+echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"red build\"></td></tr></table>"
 cat base/footer
 echo "zfs-status.sh" > tmp/trigger
-
 

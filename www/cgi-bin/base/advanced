@@ -5,6 +5,5 @@
 <td><input type="button" class="button yellow ports" onclick="location.href='/cgi-bin/container-ports.cgi';" value="fw ports"></td>
 <td><input type="button" class="button yellow ipalias" onclick="location.href='/cgi-bin/system-ipalias.cgi';" value="ip alias"></td>
 <td><input type="button" class="button yellow loadbal" onclick="location.href='/cgi-bin/container-nginx-lb.cgi';" value="load bal"></td>
-<td><input type="button" class="button red" onclick="location.href='/cgi-bin/poweroff.cgi';" value="SHUTDOWN"></td>
 </tr></table>
 <table width="100%"><tr><td width="100%" height="3px" class="green build"></td></tr>
