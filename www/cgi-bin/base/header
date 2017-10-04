@@ -1,0 +1,15 @@
+Content-type: text/html
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/css/styles.css">
+<link href='https://fonts.googleapis.com/css?family=Quantico' rel='stylesheet'>
+</head>
+<body>
+<table class="headertable">
+	<tr>
+		<td class="blue"><img src="/images/j2docker-left.png" alt="J2 Logo" class="imgheader"></td>
+	</tr>
+</table>
+

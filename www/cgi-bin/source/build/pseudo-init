@@ -1,0 +1,34 @@
+#!/bin/bash
+
+start() {
+  echo "`date` startup begun" >>/tmp/pseudo-init.log
+  /etc/init.d/ISCAgent start
+  /usr/sbin/httpd -k start
+  ccontrol start hs
+  echo "`date` startup complete" >>/tmp/pseudo-init.log
+}
+
+stop() {
+  echo "`date` shutdown begun" >>/tmp/pseudo-init.log
+  ccontrol stop hs quietly
+  /usr/sbin/httpd -k stop
+  /etc/init.d/ISCAgent stop
+  echo "`date` shutdown complete" >>/tmp/pseudo-init.log
+}
+
+restart() {
+  stop
+  start
+}
+
+echo $$ >/var/run/pseudoinit.pid
+. /sbin/telnetd &
+trap "stop; exit"  SIGTERM
+trap restart SIGHUP
+trap exit SIGINT
+
+start
+while : ; do
+  read -p "press a key for a terminal"
+  sh
+done

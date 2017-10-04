@@ -1,0 +1,3 @@
+www/cgi-bin/tmp/*
+www/cgi-bin/system/*
+www/cgi-bin/log

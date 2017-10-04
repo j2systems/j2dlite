@@ -1,0 +1,3 @@
+<script src="/scripts/websocket.js"></script>
+<table class="black" width="802px" height="480px" align="center"><tbody id="other" class="scroll"><tr id="output"></tr></tbody></table>
+

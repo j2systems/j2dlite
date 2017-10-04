@@ -1,0 +1,359 @@
+.mainconsole {
+	width: 800px;
+	height: 600px;
+	padding: 0px 0px;
+	margin: 0px 0px;
+	}
+
+.iconsole {
+	width: 640px !important;
+	height: 480px !important;
+        padding: none;
+        margin: none;
+	backgroud: yellow;
+	overflow: hidden;
+        }
+
+footer {
+	position: bottom;
+	bottom: 0px;
+	right: 10px;
+  	height: 35px;
+ 	margin: 0px 50px 0px 0px;
+	text-align: right;
+	padding: 10px 10px;
+	float: right
+}
+
+.button {
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 12px;
+	font-family: arial;
+	margin: 0px 0px;
+	cursor: pointer;
+	width: 78px;
+	height: 18px;
+}
+.nav {
+	border: none;
+	color: white;
+	padding: 5px 5px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	font-family: arial;
+	margin: 2px 2px;
+	cursor: pointer;
+	width: 78px;
+}
+.dirlisting {
+        background-color: #FFFFFF;
+        border: none;
+        color: black;
+        #padding: 5px 5px;
+        text-align: left;
+        text-decoration: none;
+        font-size: 12px;
+        font-family: arial;
+        #margin: 2px 2px;
+        width: 300px;
+
+}
+.filelisting {
+        background-color: #FFFFFF;
+        border: none;
+        color: black;
+        #padding: 5px 5px;
+        text-align: left;
+        text-decoration: none;
+        font-size: 12px;
+        font-family: arial;
+        #margin: 2px 2px;
+        cursor: pointer;
+}
+.filelistlogo {
+	max-height: 14px;
+	width: auto;
+  	height: auto;
+}
+.searchlisting {
+        background-color: #FFFFFF;
+        border: none;
+        color: black;
+        text-align: left;
+        text-decoration: none;
+        font-size: 12px;
+        font-family: arial;
+}
+.searchlisting:hover {
+	background-color: #B3EF50;
+}
+.imgheader {
+	display: block;
+	max-height:30px;
+	width: auto;
+	height: auto;
+	border: none;
+	border-collapse: collapse;
+}
+.imgheadermid {
+	max-height:30px;
+	width: 100%;
+	text-align: center;
+	font-size: 14px;
+	font-family: arial;
+}
+.headertable { 
+	border-collapse: collapse;
+}	border: none;
+		
+
+.img {
+	background-image:url("header.jpg");
+	width:1024px;
+	height:100px;
+}
+.instruction {
+	text-align: center;
+	font-size: 12px;
+        font-family: arial;
+}
+.information {
+	text-align: center;
+	font-size: 14px;
+        font-family: arial;
+}
+.p {
+	font-size:100%;
+	font-family:arial;
+	text-align:center;
+}
+.textbox {
+	border: none;
+	color: white;
+	text-align: left;
+	text-decoration: none;
+	font-size: 12px;
+	font-family: arial;
+	margin: 2px 2px;
+	cursor: pointer;
+	width :99%;
+}
+.console {
+	border: none;
+	color: #00F000;
+	background-color: #555555;
+	text-align: left;
+	text-decoration: none;
+	font-size: 14px;
+	font-family: Quantico;
+	margin: 2px 2px;
+	width: 800px;
+}
+.consolestatus {
+	font-size: 12px;
+	font-family: Quantico;
+	background-color: #555555;
+	width: 320px;
+}
+
+.label {
+	border: none;
+	color: black;
+	text-align: left;
+	text-decoration: none;
+	font-size: 14px;
+	font-family: arial;
+	margin: 2px 2px;
+	padding: 2px;
+}
+
+.slabel {
+	border: none;
+	color: black;
+	text-align: left;
+	text-decoration: none;
+	font-size: 12px;
+	font-family: arial;
+	margin: 0px 0px;
+	padding: none;
+}
+.condet {
+	border: none;
+	color: black;
+	text-align: left;
+	text-decoration: none;
+	font-size: 14px;
+	font-family: arial;
+	margin: 2px 2px;
+	align: left;
+}
+
+.labelother {
+	border: none;
+	color: black;
+	text-align: left;
+	text-decoration: none;
+	font-size: 14px;
+	font-family: arial;
+	margin: 2px 2px;
+	align: left;
+}
+.label2 {
+	white-space: nowrap;
+	width: 80px;
+}
+.label3 {
+	white-space: nowrap;
+	width: 120px;
+}
+.label4 {
+	white-space: nowrap;
+	width: 320px;
+}
+.label5 {
+        white-space: nowrap;
+        width: 40px;
+}
+.textbox:hover {
+	background-color: #B3EF50;
+}
+
+.textbox:focus {
+	background-color: #FFFFDE;
+	color: black;
+}
+.image {
+	colspan: 4;
+	align: center;
+}
+th {
+	font-family: arial;
+	font-size: 14px;
+	text-align: left;
+}
+.scroll {
+	overflow: auto;
+	display: inline-block;
+	height: 480px;
+}
+.squish {
+        overflow: none;
+        height: 26px;
+}
+
+.buttonstop {
+	background-color: #c0a52f;
+}
+
+.buttonconsole {
+	background-color: #555555;
+	color: #00CC00;
+}
+
+.buttoncachecon {
+        background-color: #555555;
+        color: #00CC00;
+}
+
+.buttoncacheimp {
+        background-color: #555555;
+        color: #c0a52f;
+}
+
+.buttoncachertn {
+        background-color: #555555;
+        color: #c0a52f;
+}
+.buttonstart {
+        background-color: #006000;
+}
+
+.buttonexport {
+        background-color: #555555;
+        color: #C0A52F;
+}
+
+.buttoncommit {
+        background-color: #555555;
+        color: #c0a52f;
+}
+
+.buttondelete {
+        background-color: #AA0000;
+}
+.buttonimportroutine {
+	background-color: #c0a52f;
+}
+.buttonstopinv {
+	background-color: #AA0000;
+}
+
+.buttonconsoleinv {
+	background-color: #006000;
+	color: #000000;
+}
+
+.buttoncacheconinv {
+        background-color: #006000;
+	color: #000000;
+}
+
+.buttoncacheimpinv {
+        background-color: #C0A52F;
+	color: #555555;
+}
+
+.buttoncachertninv {
+        background-color: #555555;
+        color: #c0a52f;
+}
+.buttonstartinv {
+        background-color: #006000;
+}
+
+.buttonexportinv {
+        background-color: #C0A52F;
+        color: #555555;
+}
+
+.buttoncommitinv {
+        background-color: #C0A52F;
+        color: #555555;
+}
+
+.buttondeleteinv {
+	background-color: #555555;
+        color: #AA0000;
+}
+.buttonimportroutinenc {
+	background-color: #555555;
+	color: #c0a52f;
+}
+.buttoninvisible {
+	background-color: transparent;
+	color: transparent;
+	border: none;
+	cursor: default;
+}
+	
+.blue {background-color: #008CBA;}
+.yellow {background-color: #c0a52f;}
+.green {background-color: #006000;}
+.red {background-color: #f44336;}
+.gray {background-color: #e7e7e7;}
+.black {background-color: #555555;}
+.light {background-color: #FFFFDE;}
+.lighttext {color: #FFFFDE;}
+.tyellow {color: #c0a52f;}
+.tgreen {color: #006000;}
+.tsgreen {color: #00CC00;}
+.tred {color: #AA0000;}
+.tblack {color: #000000;}
+.tbold {font-weight: bold;}
+

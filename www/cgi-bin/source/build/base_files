@@ -1,0 +1,6 @@
+cache.key /tmp
+csp.conf /etc/httpd/conf.d
+healthshare /etc/init.d
+telnetd /sbin/
+pseudo-init /sbin/
+isc_auto_install.sh /tmp

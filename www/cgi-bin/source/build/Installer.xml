@@ -1,0 +1,856 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Export generator="Cache" version="25">
+<Class name="Custom.Util.AbstractInstaller">
+<Abstract>1</Abstract>
+<TimeCreated>64399,41516.616105</TimeCreated>
+
+<Parameter name="DataDir">
+<Description>
+Directory where databases will be created.  Trailing / required.</Description>
+<Default>/InterSystems/db/</Default>
+</Parameter>
+
+<Parameter name="JrnPri">
+<Description>
+Primary journal directory</Description>
+<Default>/InterSystems/jrnpri</Default>
+</Parameter>
+
+<Parameter name="JrnAlt">
+<Description>
+Alternate journal directory</Description>
+<Default>/InterSystems/jrnalt</Default>
+</Parameter>
+
+<Parameter name="gmheap">
+<Description>
+GMHeap in bytes. The installer chooses a default value if null.</Description>
+</Parameter>
+
+<Parameter name="locksiz">
+<Description>
+locksiz in bytes. The installer chooses a default value if null.</Description>
+</Parameter>
+
+<Parameter name="globals">
+<Description>
+Global buffers in MB. The installer chooses a default value if null.</Description>
+</Parameter>
+
+<Parameter name="routines">
+<Description>
+Routine buffers in MB. The installer chooses a default value if null.</Description>
+<Default>512</Default>
+</Parameter>
+
+<Parameter name="LibNS">
+<Description>
+Common code library.</Description>
+<Default>COMMONLIB</Default>
+</Parameter>
+
+<Parameter name="LibPackage">
+<Description>
+Package to map into code library.</Description>
+<Default>Custom</Default>
+</Parameter>
+
+<Parameter name="WorkbenchNS">
+<Description>
+Workbench namespace.</Description>
+<Default>WORKBENCH</Default>
+</Parameter>
+
+<Parameter name="WorkbenchSource">
+<Description>
+Directory from which to load workbench source.</Description>
+</Parameter>
+
+<Parameter name="HubHostname">
+<Default>localhost</Default>
+</Parameter>
+
+<Parameter name="HubPort">
+<Default>80</Default>
+</Parameter>
+
+<Parameter name="Hostname">
+<Default>localhost</Default>
+</Parameter>
+
+<Parameter name="HubEndpoint">
+<Description>
+Hub Endpoint</Description>
+<Expression>"http://"_..#HubHostname_":"_..#HubPort_"/csp/healthshare/HSREGISTRY/services/HS.Hub.HSWS.WebServices.cls"</Expression>
+</Parameter>
+
+<Parameter name="SourceDir">
+<Description>
+Source code directory.</Description>
+</Parameter>
+
+<Parameter name="HubNS">
+<Description>
+Registry</Description>
+<Default>HSREGISTRY</Default>
+</Parameter>
+
+<Parameter name="HSPINS">
+<Description>
+HSPI</Description>
+<Default>HSPI</Default>
+</Parameter>
+
+<Parameter name="BusList">
+<Description>
+List of bus namespaces or "".  (Don't use $lb() for the empty set.)</Description>
+<Expression>$listbuild("HSBUS")</Expression>
+</Parameter>
+
+<Parameter name="ECRList">
+<Description>
+List of Edge Gateway namespaces or "".  (Don't use $lb() for the empty set.)</Description>
+<Expression>$listbuild("HSEDGE1")</Expression>
+</Parameter>
+
+<Parameter name="AGList">
+<Description>
+List of Access Gateway namespaces or "".  (Don't use $lb() for the empty set.)</Description>
+<Expression>$listbuild("HSACCESS")</Expression>
+</Parameter>
+
+<Method name="setup">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#Define VarDefault(%lval,%rval) s:'$D(pVars(%lval)) pVars(%lval)=%rval
+	$$$VarDefault("ServicePwd",$random(999999999))
+	$$$VarDefault("HubEndpoint",..#HubEndpoint)
+	$$$VarDefault("HOSTNAME",..#Hostname)
+
+	
+	set tSC=$$$OK
+	// These are installed on all hosts (commonlib and workbench)
+	try {
+	
+		// Save pVars because they get modified during installation
+		Merge pVarsOrig = pVars
+		
+		/// Set NetworkHostName for mirroring and to get the right hostname
+		s ^%SYS("HealthShare","NetworkHostName")=..#Hostname
+	
+		// Install commonlib, workbench, users, and stuff common to all systems
+		$$$ThrowOnError(..UserInstall(.pVars,pLogLevel))
+		$$$ThrowOnError(..CommonInstall(.pVars,pLogLevel))
+		//d ..ConfigureSourceControl(..#WorkbenchNS,.pVars)
+
+
+		// Install hub
+		kill pVars
+		Merge pVars = pVarsOrig
+		$$$ThrowOnError(..HubInstall(.pVars,.pLogLevel))
+		
+		// Install HSPI
+		kill pVars
+		Merge pVars = pVarsOrig
+		$$$ThrowOnError(..PIInstall(.pVars,.pLogLevel))
+
+			
+		// Install Bus(es)
+		if $listlength(..#BusList)>0 {
+			s i=0
+			while $listnext(..#BusList,i,Bus) {
+				kill pVars
+				Merge pVars = pVarsOrig
+				s pVars("NS")=Bus
+				$$$ThrowOnError(..BusInstall(.pVars,.pLogLevel))
+			}
+		}
+
+		// Install Edges
+		if $listlength(..#ECRList)>0 {
+			s i=0
+			while $listnext(..#ECRList,i,ECR) {
+				kill pVars
+				Merge pVars = pVarsOrig
+				s pVars("NS")=ECR
+				$$$ThrowOnError(..EdgeInstall(.pVars,.pLogLevel))
+			}
+		}
+		
+		// Install AGs
+		if $listlength(..#AGList)>0 {
+			s i=0
+			while $listnext(..#AGList,i,AG) {
+				kill pVars
+				Merge pVars = pVarsOrig
+				s pVars("NS")=AG
+				$$$ThrowOnError(..AccessInstall(.pVars,.pLogLevel))
+			}
+		}
+		
+		
+	} catch exception {
+		set tSC=exception.AsStatus()
+	}
+	quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="UserInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#; Let XGL document generate code for this method. 
+	Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+	%code, "UserInstall")
+]]></Implementation>
+</Method>
+
+<XData name="UserInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+	<Log Level="3" Text="Creating Users"/>
+	<User 
+	    Username="REMOTE_Services" PasswordVar="ServicePwd"
+	    Roles="%All" Fullname="Workbench Monitor"
+	    Namespace="${#WorkbenchNS}" Enabled="1"
+	    Comment="Workbench Service Account"/>
+</Manifest>
+]]></Data>
+</XData>
+
+<Method name="CommonInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+	#; Let XGL document generate code for this method. 
+	Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+	%code, "CommonInstall")
+]]></Implementation>
+</Method>
+
+<XData name="CommonInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+
+	<If Condition='$length("${#JrnPri}")>0'>
+		<Invoke Class="%Library.File" Method="CreateDirectoryChain" CheckStatus="1">
+			<Arg Value="${JrnPri}"/>
+		</Invoke>
+		<SystemSetting Name="Config.Journal.CurrentDirectory" Value="${#JrnPri}"/>
+	</If>
+	<If Condition='$length("${#JrnAlt}")>0'>
+		<Invoke Class="%Library.File" Method="CreateDirectoryChain" CheckStatus="1">
+			<Arg Value="${JrnAlt}"/>
+		</Invoke>
+		<SystemSetting Name="Config.Journal.AlternateDirectory" Value="${#JrnAlt}"/>
+	</If>
+	<If Condition='$length("${#gmheap}")>0'>
+		<SystemSetting Name="Config.config.gmheap" Value="${#gmheap}"/>
+	</If>
+	<If Condition='$length("${#locksiz}")>0'>
+		<SystemSetting Name="Config.config.locksiz" Value="${#locksiz}"/>
+	</If>
+	<If Condition='$length("${#globals}")>0'>
+		<SystemSetting Name="Config.config.globals8kb" Value="${#globals}"/>
+	</If>
+	<If Condition='$length("${#routines}")>0'>
+		<SystemSetting Name="Config.config.routines" Value="${#routines}"/>
+	</If>
+	 
+	 <If Condition='$length("${#WorkbenchNS}")>0'>
+	 <If Condition='##class(Config.Namespaces).Exists("${#WorkbenchNS}")=0'>
+		<Namespace Name="${#WorkbenchNS}" 
+			Create="yes"
+	        Code="${#WorkbenchNS}" Data="${#WorkbenchNS}">
+	      <Configuration>
+	        <Database Name="${#WorkbenchNS}" 
+	        	Create="yes"
+	            Dir="${#DataDir}${#WorkbenchNS}"
+	            Resource="%DB_${#WorkbenchNS}"/>    
+	            <ClassMapping Package="HS" From="HSLIB"/>
+	            <ClassMapping Package="Test" From="HSLIB"/>
+	            <RoutineMapping Routines="HS.*" From="HSLIB"/>
+	      </Configuration>
+	      <Import File="${#WorkbenchSource}" IgnoreErrors="1" Flags="ck" Recurse="1"/>
+	      <Production>
+	      	<Credential Name="REMOTE_Services"
+	      		Username="REMOTE_Services"
+	      		Password="${ServicePwd}"
+	      		Overwrite="1"/>
+	      </Production>
+	    </Namespace>
+	</If>
+	</If>
+    
+    <If Condition='$length("${#LibNS}")>0'>
+    <If Condition='##class(Config.Namespaces).Exists("${#LibNS}")=0'>
+	    <Namespace Name="${#LibNS}" Create="yes"
+	        Code="${#LibNS}" Data="${#LibNS}">
+	      <Configuration>
+	        <Database Name="${#LibNS}" Create="yes" 
+	            Dir="${#DataDir}${#LibNS}"
+	            Resource="%DB_${#LibNS}"/>
+	        <ClassMapping Package="Workbench" From="${#WorkbenchNS}"/>
+	        <ClassMapping Package="HS" From="HSLIB"/>
+	        <ClassMapping Package="Test" From="HSLIB"/>
+			<RoutineMapping Routines="HS.*" From="HSLIB"/>
+	      </Configuration>
+	      <Import File="${#SourceDir}" IgnoreErrors="1" Flags="ck" Recurse="1"/>
+	    </Namespace>
+	</If>
+	</If>
+</Manifest>
+]]></Data>
+</XData>
+
+<Method name="HubInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "HubInstall")
+]]></Implementation>
+</Method>
+
+<XData name="HubInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+	<Log Level="3" Text="Starting HubInstall for namespace ${#HubNS}"/>
+	<If Condition='$length("${#HubNS}")>0'>
+    <If Condition='##class(Config.Namespaces).Exists("${#HubNS}")=0'>
+	    <Namespace Name="${#HubNS}" Create="yes"
+	    Code="${#RegistryName}" Data="${#HubNS}">
+	    <Configuration>
+	    <Database Name="${#HubNS}" Create="yes" 
+	            Dir="${#DataDir}${#HubNS}"
+	            Resource="%DB_${#HubNS}"/>
+	        <GlobalMapping Global="Workbench.SourceControl" From="${#LibNS}"/>
+	        <GlobalMapping Global="Workbench.Subversion" From="${#LibNS}"/>
+	        <ClassMapping Package="Workbench" From="${#WorkbenchNS}"/>
+	        <ClassMapping Package="${#LibPackage}" From="${#LibNS}"/>	        
+	    </Configuration>
+	    	    
+	    </Namespace>
+	    <Namespace Name="HSLIB" Create="no">
+	    	 <Invoke Class="HS.Util.Installer" Method="InstallHub">
+	    	 	<Arg Value="${#HubNS}"/>
+	    	 	<Arg Value=".pVars"/>
+	    	 </Invoke>
+	    </Namespace>
+    </If>
+    </If>
+    
+
+ </Manifest>
+]]></Data>
+</XData>
+
+<Method name="PIInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "PIInstall")
+]]></Implementation>
+</Method>
+
+<XData name="PIInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+	<Log Level="3" Text="Starting PIInstall for namespace ${#HSPINS}"/>
+	<If Condition='$length("${#HSPINS}")>0'>
+    <If Condition='##class(Config.Namespaces).Exists("${#HSPINS}")=0'>
+	    <Namespace Name="${#HSPINS}" Create="yes"
+	    Code="${#RegistryName}" Data="${#HSPINS}">
+	    <Configuration>
+	    <Database Name="${#HSPINS}" Create="yes" 
+	            Dir="${#DataDir}${#HSPINS}"
+	            Resource="%DB_${#HSPINS}"/>
+	        <GlobalMapping Global="Workbench.SourceControl" From="${#LibNS}"/>
+	        <GlobalMapping Global="Workbench.Subversion" From="${#LibNS}"/>
+	        <ClassMapping Package="Workbench" From="${#WorkbenchNS}"/>
+	        <ClassMapping Package="${#LibPackage}" From="${#LibNS}"/>	        
+	    </Configuration>
+	    	    
+	    </Namespace>
+	    <Namespace Name="HSLIB" Create="no">
+	    	 <Invoke Class="HS.Util.Installer.HSPILIB" Method="Install">
+	    	 	<Arg Value="${#HSPINS}"/>
+	    	 	<Arg Value=".pVars"/>
+	    	 </Invoke>
+	    </Namespace>
+    </If>
+    </If>
+    
+
+ </Manifest>
+]]></Data>
+</XData>
+
+<Method name="BusInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "BusInstall")
+]]></Implementation>
+</Method>
+
+<XData name="BusInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>  
+    <If Condition='##class(Config.Namespaces).Exists("${NS}")=0'>
+    <Namespace Name="${NS}" Create="yes"
+    Code="${NS}" Data="${NS}">
+    <Configuration>
+    <Database Name="${NS}" Create="yes" 
+            Dir="${#DataDir}${NS}"
+            Resource="%DB_${NS}"/>
+        <GlobalMapping Global="Workbench.SourceControl" From="${#LibNS}"/>
+        <GlobalMapping Global="Workbench.Subversion" From="${#LibNS}"/>
+        <ClassMapping Package="Workbench" From="${#WorkbenchNS}"/>     
+	    <ClassMapping Package="${#LibPackage}" From="${#LibNS}"/>
+    </Configuration>
+    </Namespace>
+    
+    <Namespace Name="HSLIB">
+    <Invoke Class="HS.Util.Installer" Method="InstallBus">
+    <Arg name="pNS" Value="${NS}"/>
+    <Arg name="pVars" Value="pVars"/>
+    </Invoke>
+    </Namespace>
+    </If>
+    
+</Manifest>
+]]></Data>
+</XData>
+
+<Method name="EdgeInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "EdgeInstall")
+]]></Implementation>
+</Method>
+
+<XData name="EdgeInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>   
+    <If Condition='##class(Config.Namespaces).Exists("${NS}")=0'>
+    <Namespace Name="${NS}" Create="yes"
+    Code="${NS}" Data="${NS}">
+    <Configuration>
+    <Database Name="${NS}" Create="yes" 
+            Dir="${#DataDir}${NS}"
+            Resource="%DB_${NS}"/>
+        <GlobalMapping Global="Workbench.SourceControl" From="${#LibNS}"/>
+        <GlobalMapping Global="Workbench.Subversion" From="${#LibNS}"/>
+        <ClassMapping Package="Workbench" From="${#WorkbenchNS}"/>
+    <ClassMapping Package="${#LibPackage}" From="${#LibNS}"/>
+    </Configuration>
+    </Namespace>    
+  	<Namespace Name="HSLIB">
+    <Invoke Class="HS.Util.Installer" Method="InstallEdgeGateway">
+    <Arg name="pNS" Value="${NS}"/>
+    <Arg name="pVars" Value="${.pVars}"/>
+    </Invoke>
+    </Namespace>
+    </If>
+</Manifest>
+]]></Data>
+</XData>
+
+<Method name="AccessInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "AccessInstall")
+]]></Implementation>
+</Method>
+
+<XData name="AccessInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>   
+	<If Condition='##class(Config.Namespaces).Exists("${NS}")=0'>
+    <Namespace Name="${NS}" Create="yes"
+    Code="${NS}" Data="${NS}">
+    <Configuration>
+    <Database Name="${NS}" Create="yes" 
+            Dir="${#DataDir}${NS}"
+            Resource="%DB_${NS}"/>
+        <GlobalMapping Global="Workbench.SourceControl" From="${#LibNS}"/>
+        <GlobalMapping Global="Workbench.Subversion" From="${#LibNS}"/>
+        <ClassMapping Package="Workbench" From="${#WorkbenchNS}"/>
+    <ClassMapping Package="${#LibPackage}" From="${#LibNS}"/>
+    </Configuration>
+    </Namespace>
+    <Namespace Name="HSLIB">
+    <Invoke Class="HS.Util.Installer" Method="InstallAccessGateway">
+    <Arg name="pNS" Value="${NS}"/>
+    <Arg name="pVars" Value=".pVars"/>
+    </Invoke>
+    </Namespace>
+    </If>
+ </Manifest>
+]]></Data>
+</XData>
+</Class>
+
+<Class name="Custom.Util.Installer">
+<TimeCreated>64399,42805.645562</TimeCreated>
+
+<UDLText name="T">
+<Content><![CDATA[
+// TODO - credentials, users, passwords, ^%SYS() entry for mirroring
+
+]]></Content>
+</UDLText>
+
+<Method name="test">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+		#Define VarDefault(%lval,%rval) s:'$D(pVars(%lval)) pVars(%lval)=%rval
+		$$$VarDefault("DataDir","/InterSystems/db/") ;# trailing / required
+		$$$VarDefault("JrnPri","/InterSystems/jrnpri")
+		$$$VarDefault("JrnAlt","/InterSystems/jrnalt")
+		// also available: gmheap, locksiz, globals, routines	
+		$$$VarDefault("WorkbenchFile","/Users/ayoder/InterSystems/Atelier/workspace/workbench-svn")
+		// these should be passed downward to the HS installers
+		$$$VarDefault("HubEndpoint","http://localhost:57773/csp/healthshare/hsregistry/services/HS.Hub.HSWS.WebServices.cls")
+		
+		
+		q ..setup(.pVars)
+]]></Implementation>
+</Method>
+
+<Method name="setup">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+		#Define VarDefault(%lval,%rval) s:'$D(pVars(%lval)) pVars(%lval)=%rval
+		$$$VarDefault("HostList","Reg")
+		q ..setupHost(pVars("HostList"),.pVars,pLogLevel)
+]]></Implementation>
+</Method>
+
+<Method name="setupHost">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[pHost:%String,&pVars,pLogLevel:%Integer=3]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+		#Define VarDefault(%lval,%rval) s:'$D(pVars(%lval)) pVars(%lval)=%rval		
+		$$$VarDefault("LibNS","COMMONLIB")
+		$$$VarDefault("LibPackage","Custom")
+		$$$VarDefault("WorkbenchNS","WORKBENCH")
+
+		// Some calls overwrite pVars; save them so they can be refreshed.
+		m pVarsFresh=pVars
+
+		set tSC=$$$OK
+		try {
+			// These are installed on all hosts (commonlib and workbench)
+			if pHost'["NOCOMMON" {   
+		   		$$$ThrowOnError(..CommonInstall(.pVars,pLogLevel))
+		   		//d ..ConfigureSourceControl("WORKBENCH",.pVars)
+			}
+		   
+		   if pHost["Reg",'##class(%SYS.Namespace).Exists("HSREGISTRY") {
+			   s tSC=..HubInstall(.pVars,.pLogLevel)
+			   //s tNS=$zu(5)
+			   //zn "HSLIB"
+			   //k pVars
+			   //m pVars=pVarsFresh
+			   //d ##class(HS.Util.Installer).InstallHub("HSREGISTRY",.pVars)
+			   //zn tNS
+		   }
+	    } catch exception {
+	    	set tSC=exception.AsStatus()
+	    }
+	    
+	    quit tSC
+]]></Implementation>
+</Method>
+
+<Method name="CommonInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "CommonInstall")
+]]></Implementation>
+</Method>
+
+<XData name="CommonInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+	<Var Name="NS" Value="${LibNS}"/>
+	
+	<IfDef Var="JrnPri">
+		<SystemSetting Name="Config.Journal.CurrentDirectory" Value="${JrnPri}"/>
+	</IfDef>
+	<IfDef Var="JrnAlt">
+		<SystemSetting Name="Config.Journal.AlternateDirectory" Value="${JrnAlt}"/>
+	</IfDef>
+	<IfDef Var="gmheap">
+		<SystemSetting Name="Config.config.gmheap" Value="${gmheap}"/>
+	</IfDef>
+	<IfDef Var="locksiz">
+		<SystemSetting Name="Config.config.locksiz" Value="${locksiz}"/>
+	</IfDef>
+	<IfDef Var="globals">
+		<SystemSetting Name="Config.config.globals8kb" Value="${globals}"/>
+	</IfDef>
+	<Default Name="routines" Value="512"/>
+	<SystemSetting Name="Config.config.routines" Value="${routines}"/>
+	
+	
+	<Namespace Name="${WorkbenchNS}" Create="yes" 
+        Code="${WorkbenchNS}" Data="${WorkbenchNS}">
+      <Configuration>
+        <Database Name="${WorkbenchNS}" 
+           Dir="${DataDir}${WorkbenchNS}"
+            Resource="%DB_${WorkbenchNS}"/>
+      </Configuration>
+      <ClassMapping Package="HS" From="HSLIB"/>
+      <ClassMapping Package="Test" From="HSLIB"/>
+      <RoutineMapping Routines="HS.*" From="HSLIB"/>
+      <Import File="${WorkbenchFile}" IgnoreErrors="1" Flags="ck" Recurse="1"/>
+    </Namespace>
+    
+    <Namespace Name="${NS}" Create="yes"
+        Code="${LibNS}" Data="${NS}">
+      <Configuration>
+        <Database Name="${NS}" Create="yes" 
+            Dir="${DataDir}${NS}"
+            Resource="%DB_${NS}"/>
+        <ClassMapping Package="Workbench" From="${WorkbenchNS}"/>
+        <ClassMapping Package="HS" From="HSLIB"/>
+        <ClassMapping Package="Test" From="HSLIB"/>
+		<RoutineMapping Routines="HS.*" From="HSLIB"/>
+      </Configuration>
+    </Namespace>
+    </Manifest>
+]]></Data>
+</XData>
+
+<Method name="HubInstall">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "HubInstall")
+]]></Implementation>
+</Method>
+
+<XData name="HubInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+	<Var Name="NS" Value="HSREGISTRY"/>
+	
+    <Namespace Name="${NS}" Create="yes"
+    Code="${NS}" Data="${NS}">
+    <Configuration>
+    <Database Name="${NS}" Create="yes" 
+            Dir="${DataDir}${NS}"
+            Resource="%DB_${NS}"/>
+        <GlobalMapping Global="Workbench.SourceControl" From="${LibNS}"/>
+        <GlobalMapping Global="Workbench.Subversion" From="${LibNS}"/>
+        <ClassMapping Package="Workbench" From="${WorkbenchNS}"/>
+
+        <ClassMapping Package="${LibPackage}" From="${LibNS}"/>
+    </Configuration>
+    </Namespace>
+    <!-- Can't get Invoke to pass the pVars downward -->
+    <!-- <Namespace Name="HSLIB">
+    <Invoke Class="HS.Util.Installer" Method="InstallHub">
+    <Arg name="pNS" Value="${NS}"/>
+    <Arg name="pVars" Value=".pVars"/>
+    </Invoke> -->
+ </Manifest>
+]]></Data>
+</XData>
+</Class>
+
+<Class name="Custom.Util.Stage1">
+<Description>
+Simple installer manifest for a multi-stage installer.  The auto-install
+option in cinstall struggles with loading and running a manifest that
+spans multiple classes, so this allows a 2-stage installation.</Description>
+<TimeCreated>64401,34844.919284</TimeCreated>
+
+<Method name="setup">
+<ClassMethod>1</ClassMethod>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+
+	// if a Stage2InstallClass is passed to cinstall, this will 
+	#Define VarDefault(%lval,%rval) s:'$D(pVars(%lval)) pVars(%lval)=%rval
+	$$$VarDefault("Stage2InstallClass","Custom.Util.GenericHS")
+	$$$VarDefault("Stage2InstallSource","/tmp/Stage2.xml")
+	
+	$$$ThrowOnError(..Stage1(.pVars,pLogLevel))
+	q $classmethod(pVars("Stage2InstallClass"),"setup",.pVars,pLogLevel)
+]]></Implementation>
+</Method>
+
+<Method name="Stage1">
+<Internal>1</Internal>
+<ClassMethod>1</ClassMethod>
+<CodeMode>objectgenerator</CodeMode>
+<FormalSpec><![CDATA[&pVars,pLogLevel:%Integer=3,pInstaller:%Installer.Installer,pLogger:%Installer.AbstractLogger]]></FormalSpec>
+<ReturnType>%Status</ReturnType>
+<Implementation><![CDATA[
+   #; Let XGL document generate code for this method. 
+   Quit ##class(%Installer.Manifest).%Generate(%compiledclass,
+      %code, "Stage1")
+]]></Implementation>
+</Method>
+
+<XData name="Stage1">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+		<Log Level="1" Text="Custom installer started: Stage1"/>
+		<Namespace Name="%SYS" Create="no">
+			<Import File="${Stage2InstallSource}" IgnoreErrors="1" Flags="ck" Recurse="1"/>
+		</Namespace>
+	</Manifest>
+]]></Data>
+</XData>
+</Class>
+
+<Class name="Custom.Util.Test">
+<Super>Custom.Util.AbstractInstaller</Super>
+<TimeCreated>64399,42805.710709</TimeCreated>
+
+<Parameter name="routines">
+<Default>300</Default>
+</Parameter>
+
+<Parameter name="globals">
+<Default>512</Default>
+</Parameter>
+
+<Parameter name="AGList">
+<Expression>$listbuild("HSACCESS","AAACCESS")</Expression>
+</Parameter>
+
+<Parameter name="ECRList">
+<Expression>$listbuild("HSEDGE1","HSEDGE2")</Expression>
+</Parameter>
+
+<XData name="UserInstall">
+<XMLNamespace>INSTALLER</XMLNamespace>
+<Data><![CDATA[
+<Manifest>
+		<Log Level="3" Text="Creating Users"/>
+		<User 
+		    Username="REMOTE_Services" PasswordVar="ServicePwd"
+		    Roles="%All" Fullname="Workbench Monitor"
+		    Namespace="${#WorkbenchNS}" Enabled="1"
+		    Comment="Workbench Service Account"/>
+		    
+		 <User Username="ayoder" Fullname="Adam Yoder" PasswordVar="ServicePwd" 
+		 	Roles="%All" Namespace="%SYS" Enabled="1" Comment="J2 Interactive"/>
+	</Manifest>
+]]></Data>
+</XData>
+</Class>
+
+<Class name="Custom.Util.WorkbenchInstall">
+<Super>Custom.Util.AbstractInstaller</Super>
+<TimeCreated>64400,31456.705404</TimeCreated>
+
+<Parameter name="globals">
+<Default>300</Default>
+</Parameter>
+
+<Parameter name="routines">
+<Default>512</Default>
+</Parameter>
+
+<Parameter name="WorkbenchSource">
+<Description>
+Directory from which to load workbench source.</Description>
+<Default>/source/InitialLoad</Default>
+</Parameter>
+
+<Parameter name="HubNS">
+<Description>
+Registry</Description>
+<Default>HSREGISTRY</Default>
+</Parameter>
+
+<Parameter name="HSPINS">
+<Description>
+HSPI</Description>
+</Parameter>
+
+<Parameter name="BusList">
+<Description>
+List of bus namespaces or "".  (Don't use $lb() for the empty set.)</Description>
+</Parameter>
+
+<Parameter name="ECRList">
+<Description>
+List of Edge Gateway namespaces or "".  (Don't use $lb() for the empty set.)</Description>
+</Parameter>
+
+<Parameter name="AGList">
+<Description>
+List of Access Gateway namespaces or "".  (Don't use $lb() for the empty set.)</Description>
+</Parameter>
+</Class>
+</Export>

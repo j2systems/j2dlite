@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# healthshare:		
+#
+# chkconfig:	345 95 5
+# description:	Healthshare
+#
+
+# Source function library.
+# . /etc/rc.d/init.d/functions
+
+
+
+DAEMON_NAME=healthshare
+LOCK_FILE=/var/lock/subsys/$DAEMON_NAME
+RETVAL=0
+
+
+DEFAULT=`ccontrol default`
+
+start() 
+{
+	# workaround for docker overlayfs
+	find /InterSystems -name CACHE.DAT -exec touch {} \;
+
+	action "$DAEMON_NAME" ccontrol start $DEFAULT quietly
+	touch $LOCK_FILE
+	RETVAL=$?
+}
+
+stop() 
+{
+	action "$DAEMON_NAME" ccontrol stop $DEFAULT quietly
+	rm -f $LOCK_FILE
+	RETVAL=$?
+}
+
+status()
+{
+	s=`ccontrol qlist $DEFAULT |awk ' BEGIN {FS="[,^]";} { print $4;}' `
+	echo "$DAEMON_NAME is $s"
+
+	case "$s" in
+	running)
+		RETVAL=0
+		;;
+	*)
+		RETVAL=1
+		;;
+	esac
+
+}
+
+
+# See how we were called.
+case "$1" in
+  start)
+	start
+        ;;
+  stop)
+	stop
+        ;;
+  restart|reload)
+	stop
+	start
+	;;
+  condrestart)
+	[ -e $LOCK_FILE ] && (stop; start)
+	;;
+  status)
+  	status 
+	;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|reload|condrestart}"
+        exit 1
+esac
+
+exit $RETVAL

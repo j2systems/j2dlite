@@ -1,0 +1,8 @@
+#!/bin/bash
+[[ $(ps -ef|grep "in.telnet -debug" -c) -ne 1 ]] && echo "Telnetd is already running" && exit
+while true
+do
+	[[ $(ps -ef|grep "in.telnet -debug" -c) -eq 1 ]] && /usr/sbin/in.telnetd -debug
+	echo "Telnet running..."
+	sleep 1
+done

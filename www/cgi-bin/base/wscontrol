@@ -1,0 +1,3 @@
+<script src="/scripts/websocket.js"></script>
+<table width="320px" height="26px" align="center"><tbody id="other" class="squish"><tr id="output"><td></td><td id="outputtd" class="consolestatus black tsgreen";></td><td id="warn"></td></tr></tbody></table>
+
