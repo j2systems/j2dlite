@@ -5,14 +5,14 @@ cat base/nav|sed "s/green build/yellow/g"
 source source/functions.sh 
 source source/filelist.sh
 . tmp/globals
-THISROOT=$SHAREDIR/$OUTDIR
+THISROOT=${SHAREDIR}
 case "${REQUEST_METHOD}" in
 	"POST")
 		read INSTRUCTION
 		CURRENTPATH=$(echo $INSTRUCTION|cut -d "&" -f1)
 		INFO=$(echo $INSTRUCTION|cut -d "&" -f2)
 		TYPE=$(echo $INFO|cut -d "=" -f1)
-		VALUE=$(echo $INFO|cut -d "=" -f2)
+		VALUE=$(echo $INFO|cut -d "=" -f2|tr "+" " ")
 		SUBMITTEDPATH=$(echo $CURRENTPATH|cut -d "=" -f2|sed "s,%2F,/,g")
 		#echo CP $CURRENTPATH,INF $INFO,TY $TYPE,VAL $VALUE,SUB $SUBMITTEDPATH
 		if [[ "$TYPE" == "dir" ]]
@@ -21,20 +21,20 @@ case "${REQUEST_METHOD}" in
 			then
 				if [[ "$SUBMITTEDPATH" == "$THISROOT" ]]
 				then
-					NEWPATH=$(echo $SUBMITTEDPATH)
+					NEWPATH="${SUBMITTEDPATH}"
 				else
-					NEWPATH=$(echo $SUBMITTEDPATH|rev|cut -d "/" -f2-|rev)
+					NEWPATH="$(echo ${SUBMITTEDPATH}|rev|cut -d "/" -f2-|rev)"
 				fi
 			else
-				NEWPATH=$SUBMITTEDPATH/$VALUE
+				NEWPATH="${SUBMITTEDPATH}/${VALUE}"
 			fi
-			THISPATH=$NEWPATH
-			[[ "$NEWPATH" == "" ]] && NEWPATH=$THISROOT
+			THISPATH="${NEWPATH}"
+			[[ "${NEWPATH}" == "" ]] && NEWPATH=${THISROOT}
 			echo "<p class=\"instruction\">Choose a routine to import</p>"
 			echo "<form action=\"./container-custom.cgi\" method=\"POST\"><table>"
 			echo "<input type=\"hidden\" name=\"path\" value=\"$NEWPATH\">"
 			[[ "$NEWPATH" != "$THISROOT" ]] && echo "<tr><td><img src=\"/images/parent-folder.png\" alt=\"PARENT FOLDER\" class=\"filelistlogo\"><input type=\"submit\" name=\"dir\" value=\"..\" class=\"filelisting\"></td></tr>"
-			list_all $NEWPATH
+			list_all "$NEWPATH"
 			echo "</table></form>"
 		else
 			. tmp/globals
@@ -64,7 +64,7 @@ case "${REQUEST_METHOD}" in
 		echo "<p class=\"instruction\">Choose a routine to import</p>"
 		echo "<form action=\"./container-custom.cgi\" method=\"POST\"><table>"
 		echo "<input type=\"hidden\" name=\"path\" value=\"$THISROOT\">"
-		list_all $THISROOT
+		list_all "${THISROOT}"
 		echo "</table></form>"
 esac
 cat base/footer

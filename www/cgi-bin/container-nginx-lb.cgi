@@ -99,7 +99,7 @@ case "${REQUEST_METHOD}" in
 esac
 
 echo "<table align=\"center\">"
-echo "<tr align=\"center\"><td class=\"label black lighttext\" colspan=\"11\">Manage nginx load-balancing</td></tr>"
+echo "<tr align=\"center\"><td class=\"label black\" colspan=\"11\">Manage nginx load-balancing.  An ngnix container called \"nginx\" must be running.</td></tr>"
 
 ### Create list of running containers
 LISTED=false

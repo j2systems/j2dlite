@@ -161,7 +161,7 @@ mcmanage(){
 			esac
 			;;
 		"remove")
-			case $3 in 
+			case ${MCTYPE} in 
 			"WINDOWS")
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 STUDIO REMOVE $4"	
 				;;
@@ -174,9 +174,10 @@ mcmanage(){
 			esac
 			;;		
 		"purge")
-			case $3 in 
+			case ${MCTYPE} in 
 			"WINDOWS")
-				${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 STUDIO PURGE ${HOSTNAME}"
+				HOSTNAME=$(echo ${HOSTNAME}|unix2dos)
+				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 STUDIO PURGE ${HOSTNAME}"
 				;;
 			"MAC"|"LINUX")
 				log "mcmanage unhandled - $1,$2,$3,$4,$5,$6,$7,$8" 

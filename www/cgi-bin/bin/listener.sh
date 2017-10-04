@@ -91,9 +91,9 @@ do
 						THISIP=$(get_container_ip $CONTAINER)
 						[[ "$THISIP" == "" ]] && sleep 0.5
 					done
+					. $SCRIPTPATH/mclientupdate.sh
 					echo "START=$THISIP" 
 					echo "REFRESH"
-					. $SCRIPTPATH/mclientupdate.sh
 				;;
 	
 				"stop")

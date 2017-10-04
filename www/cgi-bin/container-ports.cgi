@@ -43,7 +43,7 @@ esac
 unset PORTS
 . tmp/globals
 echo "<table align=\"center\">"
-echo "<tr align=\"center\"><td class=\"label blue\" colspan=\"2\">Manage firewall ports</td></tr>"
+echo "<tr><td class=\"label black\" colspan=\"2\">Manage firewall ports.  Enter a Port number and click Add.</td></tr>"
 echo "<td class=\"label label4\">Port</td><td></td></tr>"
 
 for PORT in $PORTS
