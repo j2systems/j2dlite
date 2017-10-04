@@ -73,11 +73,11 @@ bash cgroupfs-mount
 
 # Wait for IP address
 HOSTIP=$(ifconfig eth0|grep "inet addr"|tr -s " "|cut -d ":" -f2|cut -d " " -f1)
-while [[ "$HOSTIP" == "" ]]                                                     
-do                                                                                                 
-        sleep 1                                                                                    
-        HOSTIP=$(ifconfig eth0|grep "inet addr"|tr -s " "|cut -d ":" -f2|cut -d " " -f1)        
-done   
+while [[ "$HOSTIP" == "" ]]
+do
+	sleep 1                                                                                    
+	HOSTIP=$(ifconfig eth0|grep "inet addr"|tr -s " "|cut -d ":" -f2|cut -d " " -f1)        
+done
 # www
 if [[ ! -f ${MOUNTDRIVE}/web/new ]] 
 then
