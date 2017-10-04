@@ -16,13 +16,15 @@ do
 			mcmanage ${MCHOST} route remove
 			#purge hosts
 			mcmanage ${MCHOST} hosts purge
+			mcmanage ${MCHOST} hosts remove ${HOSTNAME}
 			#purge registry/atelier
 			[[ "$STUDIO" == "true" ]] && mcmanage ${MCHOST} studio purge
 			[[ "$ATELIER" == "true" ]] && mcmanage ${MCHOST} atelier purge
-			mcmanage ${MCHOST} rdp purge  
+			mcmanage ${MCHOST} rdp purge
 		fi
 	fi
 done 3<${SYSTEMPATH}/management_clients
+
 log "Issue poweroff"
 poweroff
 

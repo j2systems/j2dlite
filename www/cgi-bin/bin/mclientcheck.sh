@@ -43,7 +43,7 @@ then
 					KNOWNHOST=true                                  
 					add_host ${CHECKHOSTIP} ${RHOSTNAME}
 					ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
-					mcmanage ${RHOSTNAME} hosts add $(hostname) ${HOSTIP}
+					mcmanage ${RHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 				fi                                                      
 			fi                                                              
 		done < <(cat ${SYSTEMPATH}/management_clients)                          
