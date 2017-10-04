@@ -607,5 +607,5 @@ imagelocation() {
 }
 
 log(){
-	echo $(date +"%Y-%m-%d %H:%M") "$1" >> /var/log/system.log
+	echo $(date +"%Y-%m-%d %H:%M") "$0 $1" >> /var/log/system.log
 }
