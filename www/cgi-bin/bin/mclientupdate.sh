@@ -37,7 +37,7 @@ then
 				#purge studio/atelier
 				[[ "${STUDIO}" == "true" ]] && mcmanage ${MCHOST} studio purge
 				[[ "${ATELIER}" == "true" ]] && mcmanage ${MCHOST} atelier purge
-				mcmanage ${MCHOST} rdp purge ${MCHOST}
+				mcmanage ${MCHOST} rdp purge
 				#add hosts/studio/atelier
 				for THISCONTAINER in ${THESECONTAINERS}
 				do		
@@ -69,8 +69,8 @@ else
 				mcmanage ${MCHOST} hosts purge
 				#purge registry/atelier
 				[[ "$STUDIO" == "true" ]] && mcmanage ${MCHOST} studio purge
-				[[ "$ATELIER" == "true" ]] && mcmanage ${MCHOST} studio purge
-				[[ "$STUDIO" == "true" ]] && mcmanage ${MCHOST} studio purge rdp 
+				[[ "$ATELIER" == "true" ]] && mcmanage ${MCHOST} atelier purge
+				mcmanage ${MCHOST} rdp purge
 			fi
 		fi
 	done 3<${SYSTEMPATH}/management_clients

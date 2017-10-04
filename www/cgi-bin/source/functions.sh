@@ -71,6 +71,7 @@ GLOBALS=/var/www/cgi-bin/tmp/globals
 
 mcmanage(){
 	# $1=mc,$2=context, $3=command,$4.... detail
+	. ${TMPPATH}/globals
 	local MCHOST=$1
 	local COMMAND=$2
 	local ACTION=$3
