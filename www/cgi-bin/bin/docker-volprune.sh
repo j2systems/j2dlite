@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source /var/www/cgi-bin/source/functions.sh
+. /var/www/cgi-bin/tmp/globals
+source ${SOURCEPATH}/functions.sh
 
 # docker volume management
 # Initialise
@@ -20,7 +21,11 @@ do
 		fi
 	fi
 done
+# Give dockers prune algorithm a chance
+log "docker volume prune -f"
+docker volume prune -f
 
+# Remove anything that isn't referenced
 log "Removing any lingering volumes..."
 # Collate information
 # graph (images/containers) and volumes
@@ -46,5 +51,10 @@ do
 		rm -rf /var/lib/docker/zfs/graph/${VOLUME}
 	fi
 done< <(find /var/lib/docker/zfs/graph/ -type d -maxdepth 1 -mindepth 1 ! -name "*-init" -exec du {} -d 0 \;)
+log "...completed. Calling zfs update."
+ 
+# Update zfs info
 
-log "...completed."
+bash ${BINPATH}/zfs-status.sh
+
+

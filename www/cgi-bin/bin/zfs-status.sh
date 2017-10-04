@@ -2,8 +2,11 @@
 #
 # Creates table from zfs list
 
+. /var/www/cgi-bin/tmp/globals
+source ${SOURCEPATH}/functions.sh
 OUTPUTDIR=/var/www/cgi-bin/tmp
 
+log "Updating zfs status"
 #Clear current info
 
 for ZFSOUT in zfsstats zfspools dockervols zfsusage
