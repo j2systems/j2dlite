@@ -71,7 +71,7 @@ GLOBALS=/var/www/cgi-bin/tmp/globals
 
 mcmanage(){
 	# $1=mc,$2=context, $3=command,$4.... detail
-	. ${TMPPATH}/globals
+	. /var/www/cgi-bin/tmp/globals
 	local MCHOST=$1
 	local COMMAND=$2
 	local ACTION=$3
@@ -80,15 +80,16 @@ mcmanage(){
 	local USERNAME=$(echo ${MCDETAIL}|cut -d " " -f 2)
 	local MCTYPE=$(echo ${MCDETAIL}|cut -d " " -f 3)
 	log "${MCHOST} ${COMMAND} ${ACTION}, (${MCTYPE}), $4 $5 $6 $7"
+	[[ "${HOSTNAME}" == "$4" ]] && HOSTNAME=${HOSTNAME}-admin
+	[[ "${MCTYPE}" == "WINDOWS" ]] && HOSTNAME=$(echo ${HOSTNAME}|unix2dos)
 	case ${COMMAND} in
 	"hosts")
 		case ${ACTION} in
 		"add")
 			#Adds single host entry
-			HOSTNAME=$(hostname)
-			[[ "${HOSTNAME}" == "$4" ]] && HOSTNAME=${HOSTNAME}-admin 
 			case ${MCTYPE} in 
 			"WINDOWS")
+				log "${MCTYPE} HOSTS ADD $4 $5 ${HOSTNAME}"
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 HOSTS ADD $4 $5 ${HOSTNAME}"		
 				;;
 			"MAC"|"LINUX")
@@ -176,7 +177,7 @@ mcmanage(){
 		"purge")
 			case ${MCTYPE} in 
 			"WINDOWS")
-				HOSTNAME=$(echo ${HOSTNAME}|unix2dos)
+				#HOSTNAME=$(echo ${HOSTNAME}|unix2dos)
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 STUDIO PURGE ${HOSTNAME}"
 				;;
 			"MAC"|"LINUX")

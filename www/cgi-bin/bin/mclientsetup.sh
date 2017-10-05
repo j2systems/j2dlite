@@ -34,10 +34,13 @@ then
 		add_host ${HOSTIP} ${NEWHOSTNAME}
 		ssh -o StrictHostKeyChecking=no ${USERNAME}@${NEWHOSTNAME} hostname
 		echo "${NEWHOSTNAME} ${USERNAME} ${MANHOSTTYPE} true ${STUDIO} ${ATELIER}" >> ${SYSTEMPATH}/management_clients
-		echo "Transferring management files"
-		rsync bin/clients/* ${USERNAME}@${NEWHOSTNAME}:
+		if [[ "${MANHOSTTYPE}" == "WINDOWS" ]]
+		then
+			echo "Transferring management script"
+			rsync bin/clients/* ${USERNAME}@${NEWHOSTNAME}:
+		fi
 		echo "Adding hosts entry"
-		hosts_add_win ${USERNAME} ${NEWHOSTNAME} ${HOSTIP} $(hostname)
+		mcmanage ${NEWHOSTNAME} hosts add ${HOSTNAME}
 		rm -rf tmp/authorized_keys
 #		echo -n "Saving new ssh config..."
 #		filetool.sh -b 2>&1 >/dev/null

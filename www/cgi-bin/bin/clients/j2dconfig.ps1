@@ -11,7 +11,7 @@ param	(
 
 function IsFileAccessible()
 {
-	$HOSTSFILE = "c:\windows\system32\drivers\etc\hosts"
+	$HOSTSFILE = "C:\Windows\System32\drivers\etc\hosts"
 	[Boolean] $IsAccessible = $false
 
   try
@@ -25,12 +25,18 @@ function IsFileAccessible()
   }
   return $IsAccessible
 }
-	
-	
+		
 	switch ($changesetting)
 	{
 	"HOSTS"
 		{
+		$HOSTSFILE = "C:\Windows\System32\drivers\etc\hosts"
+		$TEMPFILE = "hosttemp"
+		if (Test-Path $TEMPFILE )
+			{
+			Remove-Item $TEMPFILE
+			}
+
 		switch ($command)
 			{
 			"ADD"
@@ -38,25 +44,28 @@ function IsFileAccessible()
 				$CONTAINERNAME=$details[0]
 				$CONTAINERIP=$details[1]
 				$CONTAINERHOST=$details[2]
-				(Get-Content c:\windows\system32\drivers\etc\hosts) -notmatch " $CONTAINERNAME " | Set-Content c:\windows\system32\drivers\etc\hosts
+				(Get-Content $HOSTSFILE) -notmatch " $CONTAINERNAME " | Set-Content $TEMPFILE
+				Add-Content $TEMPFILE "$CONTAINERIP $CONTAINERNAME #$CONTAINERHOST#"
 				$hostsstatus=IsFileAccessible
 				do	{
 					sleep 0.5
 					$hostsstatus=IsFileAccessible
 					}
 				while ($hostsstatus -eq $false)
-				Add-Content c:\windows\system32\drivers\etc\hosts "$CONTAINERIP $CONTAINERNAME #$CONTAINERHOST#"
+				Copy-Item $TEMPFILE $HOSTSFILE
 				}
 			"REMOVE"
 				{
 				$CONTAINERNAME=$details[0]
-				(Get-Content c:\windows\system32\drivers\etc\hosts) -notmatch " $CONTAINERNAME " | Set-Content c:\windows\system32\drivers\etc\hosts				
+				(Get-Content $HOSTSFILE) -notmatch " $CONTAINERNAME " | Set-Content $TEMPFILE	
+				Copy-Item $TEMPFILE $HOSTSFILE			
 				}
 
 			"PURGE"
 				{
 				$CONTAINERHOST=$details[0]
-				(Get-Content c:\windows\system32\drivers\etc\hosts) -notmatch " #$CONTAINERHOST#" | Set-Content c:\windows\system32\drivers\etc\hosts
+				(Get-Content $HOSTSFILE) -notmatch " #$CONTAINERHOST#" | Set-Content $TEMPFILE
+				Copy-Item $TEMPFILE $HOSTSFILE
 				}
 			}
 		}
@@ -137,6 +146,7 @@ function IsFileAccessible()
 				foreach ($THISCOMMENT in Get-ChildItem -path $REGISTRYPATH -recurse -EA silentlycontinue)
 					{
 						$THATCOMMENT=(Get-ItemProperty -Path $THISCOMMENT.PsPath).Comment
+						"$THISCOMMENT","$DOCKERHOST"
 						if ($THATCOMMENT -like $DOCKERHOST)
 							{
 								Remove-Item -Path $THISCOMMENT.PsPath
