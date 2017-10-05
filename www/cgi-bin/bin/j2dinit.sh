@@ -84,7 +84,9 @@ then
 	# just been pulled by /opt/bootlocal.sh
 	HERE=$(pwd)
 	cd ${MOUNTDRIVE}/web/
-	git pull https://github.com/j2systems/j2dlite
+	git fetch origin master
+	git reset --hard FETCH_HEAD
+	git clean -df
        	cd ${HERE}
                   
 else
