@@ -40,7 +40,7 @@ then
 			rsync bin/clients/* ${USERNAME}@${NEWHOSTNAME}:
 		fi
 		echo "Adding hosts entry"
-		mcmanage ${NEWHOSTNAME} hosts add ${HOSTNAME}
+		mcmanage ${NEWHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 		rm -rf tmp/authorized_keys
 #		echo -n "Saving new ssh config..."
 #		filetool.sh -b 2>&1 >/dev/null
