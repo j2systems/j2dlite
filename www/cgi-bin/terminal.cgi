@@ -60,12 +60,10 @@ case "$MODE" in
 		PASSWORD=$(echo $DETAIL|cut -d "&" -f2|cut -d "=" -f2)
 		[[ $(echo $DETAIL|grep -c "STUDIO=") -eq 1 ]] && STUDIO=true
 		[[ $(echo $DETAIL|grep -c "ATELIER=") -eq 1 ]] && ATELIER=true
-		HOSTIP=$(env|grep "REMOTE_ADDR"|cut -d "=" -f2)
 		write_global USERNAME
 		write_global PASSWORD
 		write_global STUDIO
 		write_global ATELIER
-		write_global HOSTIP
 		echo "mclientsetup.sh" > tmp/nag
 	;;
 
