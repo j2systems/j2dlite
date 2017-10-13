@@ -145,9 +145,31 @@ done
 mount /dev/zvol/docker/directIO /var/lib/docker/volumes                                 
 
 #NEED CODE HERE TO DETECT AND INSTALL VMWARE/VIRTUALBOX/PARALLELS                                                                                   
-mkdir /mnt/shared
-chmod 777 /mnt/shared
-vmhgfs-fuse -o allow_other /mnt/shared
+TYPE=$(get_hypervisor)
+if [[ "${TYPE}" != "" ]]
+then
+	[[ ! -d ${SHAREDDIR} ]] && mkdir ${SHAREDDIR}
+	case ${TYPE} in 
+		Parallels)
+			sudo -u tc tce-load -i prl_tools.tcz
+			for SHARENAME in $(cat /proc/fs/prl_fs/sf_list|grep ": "|sort|cut -d " " -f2)
+			do
+				mkdir ${SHAREDDIR}/${SHARENAME}
+				chmod 777 ${SHAREDDIR}/${SHARENAME}
+				mount -t prl_fs ${SHARENAME} ${SHAREDDIR}/${SHARENAME}
+			done
+			;;
+
+		VMware)
+			sudo -u tc tce-load -i open-vm-tools.tcz
+			vmhgfs-fuse -o allow_other ${SHAREDDIR}
+			;;
+
+		VirtualBox)
+			sudo -u tc tce-load -i vboxsf.tcz
+			;;
+	esac
+fi
 
 ln -s /usr/local/etc/ssl/certs /etc/ssl
 
