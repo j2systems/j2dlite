@@ -612,6 +612,7 @@ imagelocation() {
 log(){
 	echo $(date +"%Y-%m-%d %H:%M:%S") "$0 $1" >> /var/log/system.log
 }
+
 get_hypervisor(){
 
 	for HVS in Parallels VMware VirtualBox
