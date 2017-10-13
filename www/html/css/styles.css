@@ -261,7 +261,7 @@ th {
         color: #00CC00;
 }
 
-.buttoncacheimp {
+.buttonexecscript {
         background-color: #555555;
         color: #c0a52f;
 }
@@ -290,8 +290,16 @@ th {
 .buttonimportroutine {
 	background-color: #c0a52f;
 }
+.buttoncachesmp {
+	background-color: #E0E0F0;
+	color: #356b8d;
+}
 .buttonstopinv {
 	background-color: #AA0000;
+}
+.buttonstartinv {
+	background-color: #555555;
+	color: #00CC00;	
 }
 
 .buttonconsoleinv {
@@ -329,6 +337,51 @@ th {
 
 .buttondeleteinv {
 	background-color: #555555;
+        color: #AA0000;
+}
+
+.buttonstopstby {
+	background-color: #888888;
+	color: #c0a52f;
+}
+
+.buttonstartstby {
+	background-color: #888888;
+	color: #00CC00;	
+}
+
+.buttonconsolestby {
+	background-color: #006000;
+	color: #000000;
+}
+
+.buttoncacheconstby {
+        background-color: #006000;
+	color: #000000;
+}
+
+.buttoncacheimpstby {
+        background-color: #C0A52F;
+	color: #555555;
+}
+
+.buttoncachertnstby {
+        background-color: #555555;
+        color: #c0a52f;
+}
+
+.buttonexportstby {
+        background-color: #888888;
+        color: #555555;
+}
+
+.buttoncommitstby {
+        background-color: #888888;
+        color: #c0a52f;
+}
+
+.buttondeletestby {
+	background-color: #888888;
         color: #AA0000;
 }
 .buttonimportroutinenc {

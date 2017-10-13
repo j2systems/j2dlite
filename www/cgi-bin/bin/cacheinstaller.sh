@@ -1,22 +1,18 @@
 #!/bin/bash
 #
-# Runs an installer in healthshare image 
+# Runs an installer in healthshare image
 
-BASEDIR=/var/www/cgi-bin
-source $BASEDIR/source/functions.sh
-cd $BASEDIR
-. tmp/globals
-#	Copy installer to tmp, chmodd to 777, run installer
-	echo "docker cp $INSTALLERPATH/$INSTALLER $INSTALLCONTAINER:/tmp/${INSTALLER}.sh"
-	docker cp $INSTALLERPATH/$INSTALLER $INSTALLCONTAINER:/tmp/${INSTALLER}.sh
-	docker exec -t $INSTALLCONTAINER chmod 777 /tmp/${INSTALLER}.sh
-	docker exec -t $INSTALLCONTAINER /bin/sh -c "/tmp/${INSTALLER}.sh"
-	JOBSTATUS="complete"
-	#write_global JOBSTATUS
-	delete_global RTNCONTAINER
-	#delete_global INSTALLERPATH
-	#delete_global INSTALLER
-	#delete_global INSTALLCONTAINER
+. /var/www/cgi-bin/tmp/globals
+source ${SOURCEPATH}/functions.sh
+
+INSTALLCONTAINER=$(echo $1|cut -d "," -f1)
+INSTALLPATH=$(echo $1|cut -d "," -f2)
+INSTALLFILE=$(echo $1|cut -d "," -f3)
+
+#	Copy installer to tmp, chmod to 777, run installer
+	echo "docker cp ${INSTALLPATH}/${INSTALLfile} ${INSTALLCONTAINER}:/tmp/${INSTALLFILE}.sh"
+	docker cp ${INSTALLPATH}/${INSTALLFILE} ${INSTALLCONTAINER}:/tmp/${INSTALLFILE}.sh
+	docker exec -t ${INSTALLCONTAINER} chmod 777 /tmp/${INSTALLFILE}.sh
+	docker exec -t ${INSTALLCONTAINER} /bin/sh -c "/tmp/${INSTALLFILE}.sh"
 	echo "SCRIPT END"
-
 

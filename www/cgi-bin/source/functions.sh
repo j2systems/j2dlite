@@ -75,7 +75,7 @@ mcmanage(){
 	local MCHOST=$1
 	local COMMAND=$2
 	local ACTION=$3
-	local MCDETAIL=$(grep -e "^${MCHOST} " /var/www/cgi-bin/system/management_clients)
+	local MCDETAIL=$(grep -e "^${MCHOST} " ${SYSTEMPATH}/management_clients)
 	[[ "${MCDETAIL}" == "" ]] && log "mcmanage failed to get ${MCHOST} details." && return 1
 	local USERNAME=$(echo ${MCDETAIL}|cut -d " " -f 2)
 	local MCTYPE=$(echo ${MCDETAIL}|cut -d " " -f 3)
@@ -610,5 +610,5 @@ imagelocation() {
 }
 
 log(){
-	echo $(date +"%Y-%m-%d %H:%M") "$0 $1" >> /var/log/system.log
+	echo $(date +"%Y-%m-%d %H:%M:%S") "$0 $1" >> /var/log/system.log
 }

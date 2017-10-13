@@ -19,7 +19,7 @@ write_global MANHOSTIP
 cat base/header 
 cat base/nav|sed "s/screen4/green/g"
 cat base/advanced|sed "s/green build/yellow build/g"
-cat base/managementclient
+cat base/mclient
 echo "<input type=\"hidden\" id=\"IP\" value=\"${MANHOSTIP}\">"
 if [[ "$REQUEST_METHOD" == "POST" ]]
 then
@@ -118,7 +118,7 @@ echo "</td></tr></table>"
 #Management Clients
 echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"blue build\"></td></tr></table>"
 echo "<table align=\"center\"><tr><td class=\"label\" colspan=\"7\">Registered Management Clients</td></tr>"
-echo "<table align=\"center\"><tr class=\"information blue\"><td>HOST</td><td>USERNAME</td><td>OS</td><td>INTEGRATED</td><td>STUDIO</td><td>ATELIER</td></tr>"
+echo "<tr class=\"information blue\"><td>HOST</td><td>USERNAME</td><td>OS</td><td>INTEGRATED</td><td>STUDIO</td><td>ATELIER</td></tr>"
 while read HOST USERNAME TYPE INTEGRATED STUDIO ATELIER
 do
 	if [[ "$INTEGRATED" == "true" ]]
@@ -146,15 +146,16 @@ do
 done < ${SYSTEMPATH}/management_clients
 echo "</table>"
 echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"blue build\"></td></tr></table>"
-
 echo "<table align=\"center\">"
 echo "<tr><td><form action=\"./terminal.cgi\" method=\"POST\"><input type=\"submit\" name=\"TERMINAL\" value=\"Terminal\" class=\"button green\"></form></td></tr>"
 echo "</table>"
 echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"red build\"></td></tr></table>"
 echo "<table align=\"right\">"
-echo "<tr><td><form action=\"./poweroff.cgi\"  method=\"POST\"><input type=\"submit\" name=\"SHUTDOWN\" value=\"Power Off\" class=\"button red\"></form></td></tr>"
+echo "<tr>"
+echo "<td><button id=\"restart\" onclick=\"doSend('restart')\" class=\"button yellow\">Restart</button></td>"
+echo "<td><button id=\"shutdown\" onclick=\"doSend('shutdown')\" class=\"button red\">SHUTDOWN</button></td>"
+echo "</tr>"
 echo "</table>"
 echo "<table width=\"100%\"><tr><td width=\"100%\" height=\"3px\" class=\"red build\"></td></tr></table>"
 cat base/footer
-echo "zfs-status.sh" > tmp/trigger
 

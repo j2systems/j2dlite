@@ -21,6 +21,23 @@ do
 		fi
 	fi
 done
+# remove folders from stopped containers
+
+while read VOLUME STATUS
+do
+	if [[ "${STATUS}" == "exited" ]]
+	then
+		if [[ -d ${VOLUME} ]]
+		then
+			if [[ "$(ls ${VOLUME})" == "" ]]
+			then 
+				log "Found empty ${VOLUME} from exited container. Removing."
+				rm -rf ${VOLUME}
+			fi
+		fi
+	fi
+done < <(docker inspect $(docker ps -aq)|jq -r '.[]|[.GraphDriver.Data.Mountpoint,.State.Status]|join(" ")')
+
 # Give dockers prune algorithm a chance
 log "docker volume prune -f"
 docker volume prune -f
@@ -50,11 +67,9 @@ do
 		log "${VOLUME} found with no associated -init, image or container. Removing..."
 		rm -rf /var/lib/docker/zfs/graph/${VOLUME}
 	fi
-done< <(find /var/lib/docker/zfs/graph/ -type d -maxdepth 1 -mindepth 1 ! -name "*-init" -exec du {} -d 0 \;)
+done< <(find /var/lib/docker/zfs/graph/ -maxdepth 1 -mindepth 1 -type d ! -name "*-init" -exec du {} -d 0 \;)
 log "...completed. Calling zfs update."
  
 # Update zfs info
 
 bash ${BINPATH}/zfs-status.sh
-
-

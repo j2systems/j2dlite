@@ -84,7 +84,7 @@ then
 	# just been pulled by /opt/bootlocal.sh
 	HERE=$(pwd)
 	cd ${MOUNTDRIVE}/web/
-	git pull https://github.com/j2systems/j2dlite
+	#git pull https://github.com/j2systems/j2dlite
        	cd ${HERE}
                   
 else
@@ -95,16 +95,25 @@ fi
 mount --bind ${MOUNTDRIVE}/web/www /var/www                                             
 
 # Ready for globals.
+SHAREDIR=/mnt/shared 
 WWWROOT=/var/www/cgi-bin
 SOURCEPATH=${WWWROOT}/source
 BINPATH=${WWWROOT}/bin
 SYSTEMPATH=${WWWROOT}/system
 TMPPATH=${WWWROOT}/tmp
+JOBREQUESTPATH=${TMPPATH}/jobrequests
+JOBQUEUEPATH=${TMPPATH}/jobqueue
+JOBSTATUSPATH=${TMPPATH}/jobstatus
 HOSTNAME=$(hostname)
 [[ ! -d ${TMPPATH} ]] && mkdir ${TMPPATH} && chmod 777 ${TMPPATH}
 [[ ! -d ${SYSTEMPATH} ]] && mkdir ${SYSTEMPATH} && chmod 777 ${SYSTEMPATH}
+[[ ! -d ${MOUNTDRIVE}/system ]] && mkdir ${MOUNTDRIVE}/system && chmod 777 ${MOUNTDRIVE}/system
+[[ ! -d ${JOBREQUESTPATH} ]] && mkdir ${JOBREQUESTPATH} && chmod 777 ${JOBREQUESTPATH}
+[[ ! -d ${JOBQUEUEPATH} ]] && mkdir ${JOBQUEUEPATH} && chmod 777 ${JOBQUEUEPATH}
+[[ ! -d ${JOBSTATUSPATH} ]] && mkdir ${JOBSTATUSPATH} && chmod 777 ${JOBSTATUSPATH}
 [[ ! -f ${TMPPATH}/globals ]] && touch ${TMPPATH}/globals && chmod 777 ${TMPPATH}/globals
 [[ ! -d /var/lib/docker/volumes ]] && mkdir /var/lib/docker/volumes
+
 source ${SOURCEPATH}/functions.sh
 write_global WWWROOT
 write_global BINPATH
@@ -112,10 +121,17 @@ write_global SOURCEPATH
 write_global SYSTEMPATH
 write_global TMPPATH
 write_global MOUNTDRIVE
+write_global JOBREQUESTPATH
+write_global JOBQUEUEPATH
+write_global JOBSTATUSPATH
 write_global HOSTIP 
 write_global HOSTNAME
-SHAREDIR=/mnt
 write_global SHAREDIR
+
+# keep system dir out of gits way
+
+mount --bind /mnt/sda1/system/ /var/www/cgi-bin/system
+
 for REFERENCE in management_clients known_ips
 do                                           
         if [[ ! -f ${SYSTEMPATH}/${REFERENCE} ]]
@@ -127,8 +143,11 @@ done
 # directIO may have just been created.  Check and format if required.
 [[ $(blkid /dev/zvol/docker/directIO|grep -c "xfs") -eq 0 ]] && mkfs.xfs /dev/zvol/docker/directIO                                                                                      
 mount /dev/zvol/docker/directIO /var/lib/docker/volumes                                 
-                                                                                        
-vmhgfs-fuse -o allow_other /mnt/hgfs                                                    
+
+#NEED CODE HERE TO DETECT AND INSTALL VMWARE/VIRTUALBOX/PARALLELS                                                                                   
+mkdir /mnt/shared
+chmod 777 /mnt/shared
+vmhgfs-fuse -o allow_other /mnt/shared
 
 ln -s /usr/local/etc/ssl/certs /etc/ssl
 

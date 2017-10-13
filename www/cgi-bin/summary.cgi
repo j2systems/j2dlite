@@ -19,7 +19,7 @@ write_global MANHOSTIP
 #Display page
 cat base/header 
 cat base/nav|sed "s/screen1/green/g"
-cat base/managementclient
+cat base/mclient
 echo "<input type=\"hidden\" id=\"IP\" value=\"${MANHOSTIP}\">"
 echo "<table align=\"center\"><tr><td class=\"p\" colspan=\"3\">Summary</td></tr>"
 echo "<tr></tr>"
@@ -52,4 +52,4 @@ done < tmp/dockerhub
 
 echo "</table>"
 cat base/footer
-echo "dockerhub.sh" > tmp/trigger
+

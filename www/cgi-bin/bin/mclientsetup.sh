@@ -1,49 +1,52 @@
 #!/bin/bash
 #
 # Script to add rsa pub key to client and update tmp/management-clients
-ROOTPATH=/var/www/cgi-bin
-cd $ROOTPATH
-source source/functions.sh
-. tmp/globals
-# open_terminal
+. /var/www/cgi-bin/tmp/globals
+source ${SOURCEPATH}/functions.sh
+
+echo $1
+MCUSERNAME=$(echo $1|cut -d "," -f1)
+MCPASSWORD=$(echo $1|cut -d "," -f2)
+MCHOSTTYPE=$(echo $1|cut -d "," -f3)
+MCHOSTIP=$(echo $1|cut -d "," -f4)
+MCSTUDIO=$(echo $1|cut -d "," -f5)
+MCATELIER=$(echo $1|cut -d "," -f6)
 echo "Add integrated client."
 echo "This will add an RSA certificate to the \"authorized_keys\" file"
-echo "in the users .ssh directory on ${HOSTIP}."
+echo "in the users .ssh directory on ${MCHOSTIP}."
 echo 
-if [[ "$(sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOSTIP} echo ok)" == "ok" ]]
+if [[ "$(sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} echo ok)" == "ok" ]]
 then
-	if [[ "$(sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOSTIP} ls .ssh)" == "" ]]
+	if [[ "$(sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} ls .ssh)" == "" ]]
 	then
-		sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOSTIP} mkdir .ssh
-		sshpass -p ${PASSWORD} ssh -o StrictHostKeyChecking=no ${USERNAME}@${HOSTIP} chmod 700 .ssh
+		sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} mkdir .ssh
+		sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${<CUSERNAME}@${MCHOSTIP} chmod 700 .ssh
 	else
-		sshpass -p ${PASSWORD} rsync ${USERNAME}@${HOSTIP}:.ssh/authorized_keys tmp/authorized_keys
+		sshpass -p ${MCPASSWORD} rsync ${MCUSERNAME}@${MCHOSTIP}:.ssh/authorized_keys tmp/authorized_keys
 	fi 
 	cat /root/.ssh/id_rsa.pub >> tmp/authorized_keys
 	echo "Transferring authorized keys back to client."
-	sshpass -p ${PASSWORD} rsync tmp/authorized_keys ${USERNAME}@${HOSTIP}:.ssh/authorized_keys 
+	sshpass -p ${MCPASSWORD} rsync tmp/authorized_keys ${MCUSERNAME}@${MCHOSTIP}:.ssh/authorized_keys 
 	echo "Keys in place.  Testing logon."
-	NEWHOSTNAME=$(ssh ${USERNAME}@${HOSTIP} hostname | dos2unix)
+	NEWHOSTNAME=$(ssh ${MCUSERNAME}@${MCHOSTIP} hostname | dos2unix)
 	if [[ "${NEWHOSTNAME}" == "" ]]
 	then
 		echo "Transfer failed."
 	else
 		echo "Success."
-		echo "Adding ${HOSTIP} to integrated clients list."
+		echo "Adding ${MCHOSTIP} to integrated clients list."
 		sed  -i "/${NEWHOSTNAME}/d" ${SYSTEMPATH}/management_clients 
-		add_host ${HOSTIP} ${NEWHOSTNAME}
-		ssh -o StrictHostKeyChecking=no ${USERNAME}@${NEWHOSTNAME} hostname
-		echo "${NEWHOSTNAME} ${USERNAME} ${MANHOSTTYPE} true ${STUDIO} ${ATELIER}" >> ${SYSTEMPATH}/management_clients
-		if [[ "${MANHOSTTYPE}" == "WINDOWS" ]]
+		add_host ${MCHOSTIP} ${NEWHOSTNAME}
+		ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${NEWHOSTNAME} hostname
+		echo "${NEWHOSTNAME} ${MCUSERNAME} ${MCHOSTTYPE} true ${MCSTUDIO} ${MCATELIER}" >> ${SYSTEMPATH}/management_clients
+		if [[ "${MCHOSTTYPE}" == "WINDOWS" ]]
 		then
 			echo "Transferring management script"
-			rsync bin/clients/* ${USERNAME}@${NEWHOSTNAME}:
+			rsync ${BINPATH}/clients/* ${MCUSERNAME}@${NEWHOSTNAME}:
 		fi
 		echo "Adding hosts entry"
 		mcmanage ${NEWHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 		rm -rf tmp/authorized_keys
-#		echo -n "Saving new ssh config..."
-#		filetool.sh -b 2>&1 >/dev/null
 		echo "done."
 	fi
 else
@@ -52,7 +55,3 @@ fi
 
 echo "SCRIPT END"
 rm -rf tmp/authorized_keys
-delete_global USERNAME
-delete_global PASSWORD
-delete_global STUDIO
-delete_global ATELIER

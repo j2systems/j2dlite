@@ -85,7 +85,6 @@ function onMessage(evt)
 		createButton("No","No","MC","declineHost",myip,"button yellow");
 	}else {
 		removeElement("MC");
-		WebSocketClose();
 	}
 }
 window.addEventListener("load", init, false);
