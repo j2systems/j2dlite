@@ -154,15 +154,15 @@ then
 			sudo -u tc tce-load -i prl_tools.tcz
 			for SHARENAME in $(cat /proc/fs/prl_fs/sf_list|grep ": "|sort|cut -d " " -f2)
 			do
-				mkdir ${SHAREDDIR}/${SHARENAME}
-				chmod 777 ${SHAREDDIR}/${SHARENAME}
-				mount -t prl_fs ${SHARENAME} ${SHAREDDIR}/${SHARENAME}
+				mkdir ${SHAREDIR}/${SHARENAME}
+				chmod 777 ${SHAREDIR}/${SHARENAME}
+				mount -t prl_fs ${SHARENAME} ${SHAREDIR}/${SHARENAME}
 			done
 			;;
 
 		VMware)
 			sudo -u tc tce-load -i open-vm-tools.tcz
-			vmhgfs-fuse -o allow_other ${SHAREDDIR}
+			vmhgfs-fuse -o allow_other ${SHAREDIR}
 			;;
 
 		VirtualBox)
