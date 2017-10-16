@@ -148,7 +148,7 @@ mount /dev/zvol/docker/directIO /var/lib/docker/volumes
 TYPE=$(get_hypervisor)
 if [[ "${TYPE}" != "" ]]
 then
-	[[ ! -d ${SHAREDDIR} ]] && mkdir ${SHAREDDIR}
+	[[ ! -d ${SHAREDIR} ]] && mkdir ${SHAREDIR}
 	case ${TYPE} in 
 		Parallels)
 			sudo -u tc tce-load -i prl_tools.tcz
