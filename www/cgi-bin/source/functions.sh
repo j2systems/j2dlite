@@ -614,7 +614,7 @@ log(){
 }
 
 get_hypervisor(){
-
+	HYPERVISOR=$(lspci|grep Virtual)
 	for HVS in Parallels VMware VirtualBox
 	do
 		[[ $(echo ${HYPERVISOR}|grep -c "${HVS}") -eq 1 ]] && echo ${HVS}
