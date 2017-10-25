@@ -17,4 +17,4 @@ do
 	COUNT=$((++COUNT))
 done < ${SYSTEMPATH}/vpn_details
 IFS=${THISIFS}
-echo "DETAIL,VPN,,,,,,false:true false,: "
+echo "DETAIL,VPN,${COUNT},,,,,false:true false,: "

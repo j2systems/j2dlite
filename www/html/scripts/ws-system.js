@@ -97,8 +97,9 @@ function createElement(name,type,value,targetelement,style,context)
 	switch (type) {
 		case "INPUT":
 			var newinput = document.createElement("INPUT");
-			newinput.setAttribute("id", name + '-input');
+			newinput.setAttribute("id", name);
 			newinput.setAttribute("type",secure);
+			newinput.setAttribute("onchange",'doTask("amend=' + context + ',' + name + '")');
 			newinput.value = value;
 			newinput.innerText = value;
 			newinput.setAttribute("class",style);
@@ -109,6 +110,7 @@ function createElement(name,type,value,targetelement,style,context)
 			var newSelect = document.createElement("SELECT");
 			var theseDetails=value.split(":");
 			newSelect.setAttribute("id",name);
+			newSelect.setAttribute("onchange",'doTask("amend=' + context + ',' + name + '")');
 			options = theseDetails[1].split(" ");
 			for (var option of options) {
 				var newOPT = document.createElement("OPTION");
@@ -123,9 +125,9 @@ function createElement(name,type,value,targetelement,style,context)
 			break;
 		case "BUTTON":
 			var detail = name.split("-");
-			action = context + "=" + detail[1] + "," + detail[0].toLowerCase();
+			action = context + "=" + value + "," + detail[0].toLowerCase();
 			var newbtn = document.createElement("BUTTON");
-			newbtn.setAttribute("id", detail[1]);
+			newbtn.setAttribute("id", value);
 			newbtn.innerHTML = value;
 			newbtn.innerText = value;
 			newbtn.setAttribute("onclick", 'doTask' + '("' + action + '")');
@@ -143,9 +145,33 @@ function createElement(name,type,value,targetelement,style,context)
 
 function doTask(detail)
 {
-	command = detail.split("=");
-	action = command[1]
-	window.alert(action + "-" + command[0])
+	commandString = detail.split("=");
+	command = commandString[1].split(",");
+	item = commandString[0];
+	action = command[0];
+	
+	thisRef = command[1].split(/([0-9]+)$/);
+	thisRow = thisRef[1];
+	GetHeaders = document.getElementById("detail0-row").children
+	headerCount = GetHeaders.length
+	sendData = "";
+	for (var i = 0; i < headerCount; i++) {
+		newData = "";
+		if (GetHeaders[i].innerHTML != "") {
+			thisElem = document.getElementById(GetHeaders[i].innerHTML + thisRow);
+			if (thisElem.innerText == "") {
+				newData = thisElem.value;
+			}else {
+				newData = thisElem.innerHTML;
+			}
+			if (sendData == "") {
+				sendData = newData;
+			}else {
+				sendData = sendData + "," + newData;
+			}
+		}
+	}
+	window.alert(action + "-" + item + ":" + thisRow + "..." + sendData)
 }
 
 
