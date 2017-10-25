@@ -152,8 +152,10 @@ function doTask(detail)
 	
 	thisRef = command[1].split(/([0-9]+)$/);
 	thisRow = thisRef[1];
-	GetHeaders = document.getElementById("detail0-row").children
-	headerCount = GetHeaders.length
+	GetHeaders = document.getElementById("detail0-row").children;
+	bob = document.getElementById("detail" + thisRow + "-row").children;
+	headerCount = GetHeaders.length;
+	window.alert(document.getElementById(bob.innerHTML));
 	sendData = "";
 	for (var i = 0; i < headerCount; i++) {
 		newData = "";

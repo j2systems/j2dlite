@@ -424,7 +424,7 @@ isHS(){
 	# $1=container name
 
 	local ENTRYPOINT=$(docker inspect --format='{{json .Config.Entrypoint}}' $1|tr -d "[]\"")
-	if [[ "$ENTRYPOINT" == "/sbin/pseudo-init" ]] 
+	if [[ "$ENTRYPOINT" == "/sbin/pseudo-init" || "$ENTRYPOINT" == "/ccontainermain" ]] 
 	then
 		echo "true"
 	else
