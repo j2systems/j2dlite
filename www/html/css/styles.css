@@ -51,6 +51,19 @@ footer {
 	cursor: pointer;
 	width: 78px;
 }
+.navsmall {
+	border: none;
+	color: #555555;
+	padding: 3px 3px;
+	text-align: center;
+	text-decoration: none; 
+	display: inline-block;
+	font-size: 12px;
+	font-family: arial;
+	margin: 1px 1px;
+	cursor: pointer;
+	 width: 78px;
+}
 .dirlisting {
         background-color: #FFFFFF;
         border: none;
@@ -167,7 +180,7 @@ footer {
 	color: black;
 	text-align: left;
 	text-decoration: none;
-	font-size: 14px;
+	font-size: 12px;
 	font-family: arial;
 	margin: 2px 2px;
 	padding: 2px;
@@ -219,6 +232,10 @@ footer {
 .label5 {
         white-space: nowrap;
         width: 40px;
+}
+.label6 {
+	white-space: nowrap;
+	width: 200px;
 }
 .textbox:hover {
 	background-color: #B3EF50;
@@ -286,6 +303,29 @@ th {
 
 .buttondelete {
         background-color: #AA0000;
+}
+.buttonRestart {
+	background-color: #c0a52f;         
+}
+.buttonSHUTDOWN {
+	background-color: #AA0000;
+}
+.buttonVPN {
+	background-color: #c0a52f;
+}
+.buttonConsole {
+	background-color: #006000;
+}
+.buttonAddVPN {
+	background-color: #c0a52f;
+}
+
+.buttonConnect {
+	background-color: #006000;
+}
+
+.buttonRemove {
+	background-color: #AA0000;
 }
 .buttonimportroutine {
 	background-color: #c0a52f;

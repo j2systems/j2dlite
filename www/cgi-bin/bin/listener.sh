@@ -2,8 +2,7 @@
 #
 . /var/www/cgi-bin/tmp/globals
 source ${SOURCEPATH}/functions.sh
-echo ${REMOTE_ADDR} > /tmp/bob
-log "listener activated"
+log "listener activated."
 
 while :
 do
@@ -13,27 +12,46 @@ do
 	. ${TMPPATH}/globals
 	log "RUN ${DOTHIS}"
 	ACTION=$(echo $DOTHIS|cut -d "=" -f1)
-	CONTAINER=$(echo $DOTHIS|cut -d "=" -f2-)		
+	# DETAIL may be a container name or information request, e.g. submenus,vpn details etc.
+	DETAIL=$(echo $DOTHIS|cut -d "=" -f2-)		
 	case $ACTION in
-		"restart")
-			reboot
+		"advancedbuttons")
+			bash ${BINPATH}/wsinfo-sysoptions.sh
 			;;
-		"shutdown")
-			poweroff
+		"submenu")
+			bash ${BINPATH}/wsinfo-sysoptions.sh "${DETAIL}"
+			;;
+		"vpndetails")
+			bash ${BINPATH}/wsinfo-vpn.sh
+			;;
+		"doAction")
+			case $DETAIL in
+				"Restart")
+					reboot
+					;;
+				"SHUTDOWN")
+					docker stop $(docker ps -q)
+					${BINPATH}/mclientupdate.sh
+					poweroff
+					;;
+				*)
+					[[ -f ${BINPATH}/wsdetail-${DETAIL}.sh ]] && bash ${BINPATH}/wsdetail-${DETAIL}.sh
+					;;
+			esac
 			;;
 		"containerstatus")
 			bash ${BINPATH}/container-status.sh
 			;;
 		"containerinfo")
-			bash ${BINPATH}/container-status.sh ${CONTAINER}
+			bash ${BINPATH}/container-status.sh ${DETAIL}
 			;;
 		"console")
 			kill -9 $(pgrep -o shellinaboxd)
-			if [[ "$CONTAINER" != "J2DOCKERROOT" ]]
+			if [[ "$DETAIL" != "J2DOCKERROOT" ]]
 			then
-				shellinaboxd -t --port 4202 -s ":tc::/tmp:sh -c \"/sbin/docker exec -it $CONTAINER /bin/sh\"" &
+				shellinaboxd -t --port 4202 -s ":tc::/tmp:sh -c \"/sbin/docker exec -it $DETAIL /bin/sh\"" &
 				echo ""
-				echo "CONSOLE,${REMOTE_ADDR},${CONTAINER},on,http://${HOSTIP}:4202"
+				echo "CONSOLE,${REMOTE_ADDR},${DETAIL},on,http://${HOSTIP}:4202"
 			else
 				shellinaboxd -t --port 4202 -s ":root::/tmp:/bin/sh" &
 				echo "http://${HOSTIP}:4202"
@@ -41,29 +59,29 @@ do
 			;;
 		"noconsole")
 			kill -9 $(pgrep -o shellinaboxd)
-			docker exec $CONTAINER bash -c "for PS in $(pgrep -t pts/0); do kill -9 ${PS};done"
-			echo "CONSOLE,${REMOTE_ADDR},${CONTAINER},off"
+			docker exec $DETAIL bash -c "for PS in $(pgrep -t pts/0); do kill -9 ${PS};done"
+			echo "CONSOLE,${REMOTE_ADDR},${DETAIL},off"
 			;;
 		"systemstatus")
 			bash ${BINPATH}/job-status.sh
 			;;
 		"save")
-			SAVECONTAINER=$CONTAINER
-			write_global SAVECONTAINER
+			SAVEDETAIL=$DETAIL
+			write_global SAVEDETAIL
 			;;
 		start|stop|delete|commit|export)
 			FILENAME="$(date +"%Y%m%d%H%M%S")$((RANDOM))"
-			echo "${REMOTE_ADDR},docker ${ACTION} ${CONTAINER}" > ${JOBREQUESTPATH}/${FILENAME}
+			echo "${REMOTE_ADDR},docker ${ACTION} ${DETAIL}" > ${JOBREQUESTPATH}/${FILENAME}
 			;;	
 		"post")
-			RTNCONTAINER=$CONTAINER
-			write_global RTNCONTAINER
+			RTNDETAIL=$DETAIL
+			write_global RTNDETAIL
 			;;
 		"checkclient")
-			bash ${BINPATH}/mclientcheck.sh ${CONTAINER}
+			bash ${BINPATH}/mclientcheck.sh ${DETAIL}
 			;;
 		"rejectclient")
-			echo ${CONTAINER} >> ${SYSTEMPATH}/management_clients_declined
+			echo ${DETAIL} >> ${SYSTEMPATH}/management_clients_declined
 			echo "true"
 			;;
 		"acceptclient")
@@ -71,9 +89,9 @@ do
 			;;
 
 		"interact")
-			log "interact ${CONTAINER}"
-			EXECSCRIPT=$(echo ${CONTAINER}|cut -d "," -f1)
-			EXECPARAM=$(echo ${CONTAINER}|cut -d "," -f2-)
+			log "interact ${DETAIL}"
+			EXECSCRIPT=$(echo ${DETAIL}|cut -d "," -f1)
+			EXECPARAM=$(echo ${DETAIL}|cut -d "," -f2-)
 			log "${BINPATH}/${EXECSCRIPT},${EXECPARAM}"
 			bash ${BINPATH}/${EXECSCRIPT} "${EXECPARAM}" 
 			;;

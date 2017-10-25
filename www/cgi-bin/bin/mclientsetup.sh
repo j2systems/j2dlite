@@ -29,6 +29,7 @@ then
 	sshpass -p ${MCPASSWORD} rsync tmp/authorized_keys ${MCUSERNAME}@${MCHOSTIP}:.ssh/authorized_keys 
 	echo "Keys in place.  Testing logon."
 	NEWHOSTNAME=$(ssh ${MCUSERNAME}@${MCHOSTIP} hostname | dos2unix)
+	NEWHOSTNAME=$(echo "${NEWHOSTNAME}"|cut -d "." -f1)
 	if [[ "${NEWHOSTNAME}" == "" ]]
 	then
 		echo "Transfer failed."

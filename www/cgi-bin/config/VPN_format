@@ -1,0 +1,7 @@
+RowNumber,
+VPNLabel,label
+VPNURL,input
+VPNUsername,input
+VPNPassword,password
+VPNGroup,default
+VPNGroups,dropdown

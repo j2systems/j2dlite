@@ -40,6 +40,7 @@ then
 				if [[ "${TYPE}" == "${MANHOSTTYPE}" ]]
 				then
  					RHOSTNAME=$(ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${CHECKHOSTIP} hostname 2>/dev/null|dos2unix)
+					RHOSTNAME=$(echo "${RHOSTNAME}"|cut -d "." -f1)
 					if [[ "${RHOSTNAME}" != "" ]]                            
 					then    
 						KNOWNHOST=true                                  

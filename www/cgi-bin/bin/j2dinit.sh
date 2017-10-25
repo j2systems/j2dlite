@@ -101,12 +101,14 @@ SOURCEPATH=${WWWROOT}/source
 BINPATH=${WWWROOT}/bin
 SYSTEMPATH=${WWWROOT}/system
 TMPPATH=${WWWROOT}/tmp
+CONFIGPATH=${WWWROOT}/config
 JOBREQUESTPATH=${TMPPATH}/jobrequests
 JOBQUEUEPATH=${TMPPATH}/jobqueue
 JOBSTATUSPATH=${TMPPATH}/jobstatus
 HOSTNAME=$(hostname)
-[[ ! -d ${TMPPATH} ]] && mkdir ${TMPPATH} && chmod 777 ${TMPPATH}
 [[ ! -d ${SYSTEMPATH} ]] && mkdir ${SYSTEMPATH} && chmod 777 ${SYSTEMPATH}
+[[ ! -d ${TMPPATH} ]] && mkdir ${TMPPATH} && chmod 777 ${TMPPATH}
+[[ ! -d ${CONFIGPATH} ]] && mkdir ${CONFIGPATH} && chmod 777 ${CONFIGPATH}
 [[ ! -d ${MOUNTDRIVE}/system ]] && mkdir ${MOUNTDRIVE}/system && chmod 777 ${MOUNTDRIVE}/system
 [[ ! -d ${JOBREQUESTPATH} ]] && mkdir ${JOBREQUESTPATH} && chmod 777 ${JOBREQUESTPATH}
 [[ ! -d ${JOBQUEUEPATH} ]] && mkdir ${JOBQUEUEPATH} && chmod 777 ${JOBQUEUEPATH}
@@ -120,6 +122,7 @@ write_global BINPATH
 write_global SOURCEPATH
 write_global SYSTEMPATH
 write_global TMPPATH
+write_global CONFIGPATH
 write_global MOUNTDRIVE
 write_global JOBREQUESTPATH
 write_global JOBQUEUEPATH

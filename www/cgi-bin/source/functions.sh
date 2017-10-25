@@ -620,3 +620,14 @@ get_hypervisor(){
 		[[ $(echo ${HYPERVISOR}|grep -c "${HVS}") -eq 1 ]] && echo ${HVS}
 	done
 }
+get_vpngroups(){
+	VPNDETAIL=$(echo "yes"|openconnect $1 2>&1)
+	GROUPSTRING=$(echo ${VPNDETAIL}|cut -d "[" -f2|cut -d "]" -f1|tr "|" " ")
+	SERVERCERT=$(echo ${VPNDETAIL}|cut -d "=" -f1|rev|cut -d " " -f1|rev)
+	echo ${GROUPSTRING}
+}
+get_vpncert(){
+	VPNDETAIL=$(echo "yes"|openconnect $1 2>&1)
+	SERVERCERT=$(echo ${VPNDETAIL}|cut -d "=" -f1|rev|cut -d " " -f1|rev)
+	echo ${SERVERCERT}
+}
