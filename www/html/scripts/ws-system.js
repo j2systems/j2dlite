@@ -89,18 +89,23 @@ function createElement(name,type,value,targetelement,style,context)
 	//window.alert(name + type + value + targetelement + style);
 	var newTD = document.createElement("TD");
 	if (type == "PASSWORD") {
-		type = "INPUT"
+		type = "INPUT";
 		var secure = "password"
 	}else {
 		var secure = "text"
 	}
+	if (type == "HIDDEN") {
+		type = "INPUT" ;
+		var secure = "hidden"
+	}
 	switch (type) {
 		case "INPUT":
+			//window.alert(value)
 			var newinput = document.createElement("INPUT");
 			newinput.setAttribute("id", name);
 			newinput.setAttribute("type",secure);
 			newinput.setAttribute("onchange",'doTask("' + context + '=Amend,' + name + '")');
-			newinput.value = value;
+			newinput.setAttribute("value", value);
 			newinput.innerText = value;
 			newinput.setAttribute("class",style);
 			newTD.appendChild(newinput);
@@ -155,28 +160,31 @@ function doTask(detail)
 	TheseElements = document.getElementById("detail" + thisRow + "-row").children;
 	headerCount = GetHeaders.length;
 	//if header blank, subtrace as it is a filler for a button below
-	
+	actualCount=0
 	//if Amend and there's a button
-	if (TheseElements[headerCount-1].children[0] != null) {
-		buttonCaption=(TheseElements[headerCount-1].children[0].innerHTML);
-	}else {
-		buttonCaption=(TheseElements[headerCount-2].children[0].innerHTML);
+	for (var i = 1; i < headerCount; i++) {
+		 if (TheseElements[i] != null) {
+			actualCount++
+		}
 	}
+	buttonCaption=(TheseElements[actualCount].children[0].innerHTML);
 	sendData = "";
 	dataFieldCount = 0;
 	dataCount = 0;
-	for (var i = 0; i < headerCount; i++) {
+	for (var i = 0; i <= actualCount; i++) {
 		newData = "";
 		if (GetHeaders[i].innerHTML != "") {
 			dataFieldCount++;
 			thisElem = document.getElementById(GetHeaders[i].innerHTML + thisRow);
-			if (thisElem.innerText == "") {
+			//window.alert(thisElem.value + "-" + thisRow);
+			if (thisElem.value != "") {
 				newData = thisElem.value;
 			}else {
-				newData = thisElem.innerHTML;
+				//newData = thisElem.innerHTML;
 			}
 			if (newData != "") {
 				dataCount++;
+				//window.alert(newData);
 			}
 			if (sendData == "") {
 				sendData = newData;
@@ -185,7 +193,7 @@ function doTask(detail)
 			}
 		}
 	}
-	if (buttonCaption == "Add" && action == "Amend") {
+	if ((buttonCaption == "Add" || buttonCaption == "New") && action == "Amend") {
 		//window.alert("Have a send but there is an Add button")
 	}else {
 		//window.alert(action + "-" + item + ":" + thisRow + "..." + sendData + "..." + dataCount)
@@ -344,6 +352,15 @@ function onMessage(evt)
 							}
 						}
 						break;
+					case "LINE":
+						i//window.alert("yep");
+						var newTR=document.createElement("TR");
+						newTR.setAttribute("colspan","100");
+						var newHR=document.createElement("HR");
+						newTR.appendChild(newHR);
+						document.getElementById("detail-table").appendChild(newTR);
+						break;
+						//createSeperator("detail","yellow");
 					default:
 						//add data row
 						//Message receved format: DETAIL,menu context (zfs,VPN,etc.),row counter,info......

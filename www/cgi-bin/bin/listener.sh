@@ -72,7 +72,7 @@ do
 			CONTEXT=$(echo ${CHANGE}|cut -d "," -f2)
 			DATAROW=$(echo ${CHANGE}|cut -d "," -f3)
 			case ${COMMAND} in 
-				Add)
+				Add|New)
 					log "SysReq Add ${CONTEXT} ${DATAROW} ${INFO}"
 					echo "${INFO}" >> ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
