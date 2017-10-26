@@ -99,7 +99,7 @@ function createElement(name,type,value,targetelement,style,context)
 			var newinput = document.createElement("INPUT");
 			newinput.setAttribute("id", name);
 			newinput.setAttribute("type",secure);
-			newinput.setAttribute("onchange",'doTask("amend=' + context + ',' + name + '")');
+			newinput.setAttribute("onchange",'doTask("' + context + '=Amend,' + name + '")');
 			newinput.value = value;
 			newinput.innerText = value;
 			newinput.setAttribute("class",style);
@@ -110,7 +110,7 @@ function createElement(name,type,value,targetelement,style,context)
 			var newSelect = document.createElement("SELECT");
 			var theseDetails=value.split(":");
 			newSelect.setAttribute("id",name);
-			newSelect.setAttribute("onchange",'doTask("amend=' + context + ',' + name + '")');
+			newSelect.setAttribute("onchange",'doTask("' + context + '=Amend,' + name + '")');
 			options = theseDetails[1].split(" ");
 			for (var option of options) {
 				var newOPT = document.createElement("OPTION");
@@ -149,22 +149,34 @@ function doTask(detail)
 	command = commandString[1].split(",");
 	item = commandString[0];
 	action = command[0];
-	
 	thisRef = command[1].split(/([0-9]+)$/);
 	thisRow = thisRef[1];
 	GetHeaders = document.getElementById("detail0-row").children;
-	bob = document.getElementById("detail" + thisRow + "-row").children;
+	TheseElements = document.getElementById("detail" + thisRow + "-row").children;
 	headerCount = GetHeaders.length;
-	window.alert(document.getElementById(bob.innerHTML));
+	//if header blank, subtrace as it is a filler for a button below
+	
+	//if Amend and there's a button
+	if (TheseElements[headerCount-1].children[0] != null) {
+		buttonCaption=(TheseElements[headerCount-1].children[0].innerHTML);
+	}else {
+		buttonCaption=(TheseElements[headerCount-2].children[0].innerHTML);
+	}
 	sendData = "";
+	dataFieldCount = 0;
+	dataCount = 0;
 	for (var i = 0; i < headerCount; i++) {
 		newData = "";
 		if (GetHeaders[i].innerHTML != "") {
+			dataFieldCount++;
 			thisElem = document.getElementById(GetHeaders[i].innerHTML + thisRow);
 			if (thisElem.innerText == "") {
 				newData = thisElem.value;
 			}else {
 				newData = thisElem.innerHTML;
+			}
+			if (newData != "") {
+				dataCount++;
 			}
 			if (sendData == "") {
 				sendData = newData;
@@ -173,7 +185,18 @@ function doTask(detail)
 			}
 		}
 	}
-	window.alert(action + "-" + item + ":" + thisRow + "..." + sendData)
+	if (buttonCaption == "Add" && action == "Amend") {
+		//window.alert("Have a send but there is an Add button")
+	}else {
+		//window.alert(action + "-" + item + ":" + thisRow + "..." + sendData + "..." + dataCount)
+		//check all fields not blank
+		if (dataCount == dataFieldCount) {
+			doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
+		}else {
+			window.alert("All fields require data:" + dataCount);
+		}	
+
+	}
 }
 
 

@@ -75,7 +75,7 @@ mcmanage(){
 	local MCHOST=$1
 	local COMMAND=$2
 	local ACTION=$3
-	local MCDETAIL=$(grep -e "^${MCHOST} " ${SYSTEMPATH}/management_clients)
+	local MCDETAIL=$(grep -e "^${MCHOST} " ${SYSTEMPATH}/wsdetail_MClients)
 	[[ "${MCDETAIL}" == "" ]] && log "mcmanage failed to get ${MCHOST} details." && return 1
 	local USERNAME=$(echo ${MCDETAIL}|cut -d " " -f 2)
 	local MCTYPE=$(echo ${MCDETAIL}|cut -d " " -f 3)

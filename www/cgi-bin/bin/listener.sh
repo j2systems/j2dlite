@@ -65,6 +65,38 @@ do
 		"systemstatus")
 			bash ${BINPATH}/job-status.sh
 			;;
+		"SysReq")
+			CHANGE=$(echo ${DETAIL}|cut -d ":" -f1)
+			INFO=$(echo ${DETAIL}|cut -d ":" -f2-)
+			COMMAND=$(echo ${CHANGE}|cut -d "," -f1)
+			CONTEXT=$(echo ${CHANGE}|cut -d "," -f2)
+			DATAROW=$(echo ${CHANGE}|cut -d "," -f3)
+			case ${COMMAND} in 
+				Add)
+					log "SysReq Add ${CONTEXT} ${DATAROW} ${INFO}"
+					echo "${INFO}" >> ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
+					;;
+				Amend)
+					log "SysReq Amend ${CONTEXT} ${DATAROW} ${INFO}"
+					sed -i "${DATAROW}s#.*#${INFO}#" ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
+					;;
+				Remove)
+					log "SysReq Remove ${CONTEXT} ${DATAROW} ${INFO}"
+					sed -i "${DATAROW}d" ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
+					;;
+				Connect)
+					log "SysReq Connect ${CONTEXT} ${DATAROW} ${INFO}"
+					;;
+				*)
+					log "SysReq No handler - ${COMMAND}"
+					;;
+			esac
+			;;
 		"save")
 			SAVEDETAIL=$DETAIL
 			write_global SAVEDETAIL
@@ -81,7 +113,7 @@ do
 			bash ${BINPATH}/mclientcheck.sh ${DETAIL}
 			;;
 		"rejectclient")
-			echo ${DETAIL} >> ${SYSTEMPATH}/management_clients_declined
+			echo ${DETAIL} >> ${SYSTEMPATH}/wsdetail_MClients_declined
 			echo "true"
 			;;
 		"acceptclient")

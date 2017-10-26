@@ -3,7 +3,12 @@
 # Creates list of images on docker hub
 . /var/www/cgi-bin/tmp/globals
 [[ ! -f ${SYSTEMPATH}/wsdetail_DockerHub ]] && touch  ${SYSTEMPATH}/wsdetail_DockerHub
-
+if [[ -f /var/www/cgi-bin/tmp/dockerhub ]]
+then
+	rm /var/www/cgi-bin/tmp/dockerhub
+	touch /var/www/cgi-bin/tmp/dockerhub
+	chmod 666 /var/www/cgi-bin/tmp/dockerhub
+fi
 THISIFS=$IFS
 IFS=","
 while read REPO SUBREPO USERNAME PASSWORD

@@ -34,4 +34,4 @@ do
 			esac
 		fi
 	fi
-done < ${SYSTEMPATH}/management_clients			
+done < ${SYSTEMPATH}/wsdetail_MClients			

@@ -52,7 +52,7 @@ then
 				log "${MCHOST} marked as integrated but offline"
 			fi
 		fi
-	done 3<${SYSTEMPATH}/management_clients
+	done 3<${SYSTEMPATH}/wsdetail_MClients
 else
 	#nothing is up so puge hosts
 
@@ -73,5 +73,5 @@ else
 				mcmanage ${MCHOST} rdp purge
 			fi
 		fi
-	done 3<${SYSTEMPATH}/management_clients
+	done 3<${SYSTEMPATH}/wsdetail_MClients
 fi			

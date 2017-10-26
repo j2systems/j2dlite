@@ -37,14 +37,14 @@ do
 		echo "<tr class=\"information light\">"
 	fi
 	echo "<td>$HOST</td><td>$USERNAME</td><td>$TYPE</td><td>$INTEGRATED</td><td>$STUDIO</td><td>$ATELIER</td></tr>"
-done < system/management_clients
+done < wsdetail_MClients
 echo "<tr></tr><tr><td class=\"label\" colspan=\"6\">Rejected Management Clients</td></tr>"                         
 echo "<tr class=\"information blue\"><td>HOST</td></tr>"
 while read HOST
 do                                                                                                           
 	echo "<tr class=\"information light\"><td>$HOST</td></tr>"
 
-done < system/management_clients_declined
+done < system/wsdetail_MClients_declined
 echo "</table>"
 cat base/footer
 

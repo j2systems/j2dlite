@@ -3,11 +3,11 @@
 source ${SOURCEPATH}/functions.sh
 
 [[ ! -f ${SYSTEMPATH}/wsdetail_ProxyFwd ]] && touch ${SYSTEMPATH}/wsdetail_ProxyFwd
-
-echo "DETAIL,ProxyFwd,REFRESH,URL,Port,Destination,Des Port,Remove:Add"
+echo "DETAIL,ProxyFwd,REFRESH,URL,Port,Destination,DestPort,Remove:Add"
 echo "DETAIL,ProxyFwd,FIELDS,INPUT,INPUT,SELECT,SELECT,BUTTON"
 echo "DETAIL,ProxyFwd,STYLES,gray,gray,gray,gray,red:green"
-
+THISIFS=$IFS
+IFS=","
 COUNT=1
 while read URL PORT DESTINATION DPORT
 do
@@ -15,3 +15,4 @@ do
 	COUNT=$((++COUNT))
 done < ${SYSTEMPATH}/wsdetail_ProxyFwd
 echo "DETAIL,ProxyFwd,${COUNT},,,:server1 server2 server3,:${PORTS}"
+IFS=$THISIFS

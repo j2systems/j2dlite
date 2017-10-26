@@ -2,8 +2,8 @@
 #
 # Script to check requesting client for integration
 # 1. Checks /etc/hosts.
-# 2. Checks config/management_clients_declined
-# 3. If not in management_clients_declined, tries an ssh for hostname
+# 2. Checks config/wsdetail_MClients_declined
+# 3. If not in wsdetail_MClients_declined, tries an ssh for hostname
 # 4. If hostname present, ssh successful therefore previously managed, 
 #	ip/hostname added to /etc/hosts, true sent to websocket.
 # 5. false sent to websocket, creating "Add....." option at top of page
@@ -16,7 +16,7 @@ KNOWNHOSTS=/etc/hosts
 source ${WWWROOT}/source/functions.sh
 cd ${WWWROOT}
 # check hostname
-for REFERENCE in management_clients management_clients_declined
+for REFERENCE in wsdetail_MClients wsdetail_MClients_declined
 do
 	if [[ ! -f ${SYSTEMPATH}/${REFERENCE} ]]
 	then
@@ -29,9 +29,9 @@ done
 if [[ $(grep -c -e "^${CHECKHOSTIP} " /etc/hosts) -eq 0 ]]
 then
 	# check "declined" ip list
-	if [[ $(grep -c -e "${CHECKHOSTIP}$" ${SYSTEMPATH}/management_clients_declined) -eq 0 ]]
+	if [[ $(grep -c -e "${CHECKHOSTIP}$" ${SYSTEMPATH}/wsdetail_MClients_declined) -eq 0 ]]
 	then
-		# try ssh to management_clients list
+		# try ssh to wsdetail_MClients list
 		KNOWNHOST=false                                   
 		while read HOST USERNAME TYPE STUDIO ATELIER                       
 		do      
@@ -50,7 +50,7 @@ then
 					fi
 				fi                                                      
 			fi                                                              
-		done < <(cat ${SYSTEMPATH}/management_clients)                          
+		done < <(cat ${SYSTEMPATH}/wsdetail_MClients)                          
 		echo ${KNOWNHOST}
 	else
 		echo "true"

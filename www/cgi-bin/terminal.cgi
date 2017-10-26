@@ -1,9 +1,8 @@
 #!/bin/bash
 # source functions
 
-source source/functions.sh 2>&1
-source source/manage_hosts.sh 2>&1
-source source/manage_registry.sh 2>&1
+source source/functions.sh
+
 . /tmp/globals
 delete_global MANAGEMENTHOSTS
 delete_global CONTAINERS

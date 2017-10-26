@@ -135,7 +135,7 @@ write_global SHAREDIR
 
 mount --bind /mnt/sda1/system/ /var/www/cgi-bin/system
 
-for REFERENCE in management_clients known_ips
+for REFERENCE in wsdetail_MClients
 do                                           
         if [[ ! -f ${SYSTEMPATH}/${REFERENCE} ]]
         then                                    
