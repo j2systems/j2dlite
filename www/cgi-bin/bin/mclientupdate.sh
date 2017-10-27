@@ -20,6 +20,8 @@ do
 	fi
 done < ${TMPPATH}/containers
 . /var/www/cgi-bin/tmp/globals
+THISIFS=$IFS
+IFS=","
 if [[ "${SOMETHINGTODO}" == "true" ]]
 then
 	while read -u3 MCHOST USERNAME TYPE INTEGRATE STUDIO ATELIER
@@ -39,6 +41,7 @@ then
 				[[ "${ATELIER}" == "true" ]] && mcmanage ${MCHOST} atelier purge
 				mcmanage ${MCHOST} rdp purge
 				#add hosts/studio/atelier
+				IFS=" "
 				for THISCONTAINER in ${THESECONTAINERS}
 				do		
 					THISCONTAINERIP=$(get_container_ip ${THISCONTAINER})
@@ -47,6 +50,7 @@ then
 					[[ "$ATELIER" == "true" && "$(isHS ${THISCONTAINER})" == "true" ]] && mcmanage ${MCHOST} atelier add ${THISCONTAINER}
 					[[ "$(isRDP ${THISCONTAINER})" == "true" ]] && mcmanage ${MCHOST} rdp add ${THISCONTAINER}
 				done
+				IFS=","
 				#hosts_add_nginx $TYPE
 			else
 				log "${MCHOST} marked as integrated but offline"
@@ -74,4 +78,5 @@ else
 			fi
 		fi
 	done 3<${SYSTEMPATH}/wsdetail_MClients
-fi			
+fi
+IFS=$THISIFS			
