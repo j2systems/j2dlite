@@ -21,10 +21,7 @@ do
 		"submenu")
 			bash ${BINPATH}/wsinfo-sysoptions.sh "${DETAIL}"
 			;;
-		"vpndetails")
-			bash ${BINPATH}/wsinfo-vpn.sh
-			;;
-		"doAction")
+		"getDetail")
 			case $DETAIL in
 				"Restart")
 					reboot
@@ -73,19 +70,16 @@ do
 			DATAROW=$(echo ${CHANGE}|cut -d "," -f3)
 			case ${COMMAND} in 
 				Add|New)
-					log "SysReq Add ${CONTEXT} ${DATAROW} ${INFO}"
 					echo "${INFO}" >> ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
 				Amend)
-					log "SysReq Amend ${CONTEXT} ${DATAROW} ${INFO}"
 					sed -i "${DATAROW}s#.*#${INFO}#" ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
 				Remove)
-					log "SysReq Remove ${CONTEXT} ${DATAROW} ${INFO}"
 					sed -i "${DATAROW}d" ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;

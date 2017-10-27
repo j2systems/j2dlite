@@ -621,7 +621,7 @@ get_hypervisor(){
 	done
 }
 get_vpngroups(){
-	VPNDETAIL=$(echo "yes"|openconnect $1 2>&1)
+	VPNDETAIL=$(echo "yes"|openconnect -q "$1" --non-inter 2>&1|grep GROUP)
 	GROUPSTRING=$(echo ${VPNDETAIL}|cut -d "[" -f2|cut -d "]" -f1|tr "|" " ")
 	SERVERCERT=$(echo ${VPNDETAIL}|cut -d "=" -f1|rev|cut -d " " -f1|rev)
 	echo ${GROUPSTRING}

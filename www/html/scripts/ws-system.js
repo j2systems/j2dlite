@@ -84,6 +84,7 @@ function createSeperator(thisDIV,thisStyle)
 	toRow = document.getElementById(thisDIV + "-seperator-row");
 	toRow.appendChild(newTD);	
 }
+
 function createElement(name,type,value,targetelement,style,context)
 {
 	//window.alert(name + type + value + targetelement + style);
@@ -140,6 +141,10 @@ function createElement(name,type,value,targetelement,style,context)
 			newTD.appendChild(newbtn);
 			//
 			break;
+		case "LINE":
+			var newHR = document.createElement("HR");
+			newTD.appendChild(newHR);
+			break;
 		default:
 			newTD.innerHTML = value;
 			newTD.setAttribute("class",style);
@@ -147,6 +152,21 @@ function createElement(name,type,value,targetelement,style,context)
 		}
 	document.getElementById(targetelement).appendChild(newTD);
 }
+
+function elementCount()
+{
+	GetHeaders = document.getElementById("detail0-row").children;
+	//TheseElements = document.getElementById("detail" + thisRow + "-row").children; 
+	actualCount=0;
+	headerCount = GetHeaders.length;
+	for (var i = 0; i < headerCount; i++) {
+		if (GetHeaders[i].innerText != "") {
+			actualCount++;
+		}
+	}
+	return actualCount;
+}
+
 
 function doTask(detail)
 {
@@ -159,38 +179,29 @@ function doTask(detail)
 	GetHeaders = document.getElementById("detail0-row").children;
 	TheseElements = document.getElementById("detail" + thisRow + "-row").children;
 	headerCount = GetHeaders.length;
-	//if header blank, subtrace as it is a filler for a button below
-	actualCount=0
-	//if Amend and there's a button
-	for (var i = 1; i < headerCount; i++) {
-		 if (TheseElements[i] != null) {
-			actualCount++
-		}
-	}
-	buttonCaption=(TheseElements[actualCount].children[0].innerHTML);
+	actualCount = elementCount();
+
+	//window.alert(actualCount)
+	buttonCaption=(TheseElements[actualCount].innerText);
+	//window.alert(buttonCaption)
 	sendData = "";
 	dataFieldCount = 0;
 	dataCount = 0;
-	for (var i = 0; i <= actualCount; i++) {
+	for (var i = 0; i < actualCount; i++) {
 		newData = "";
-		if (GetHeaders[i].innerHTML != "") {
-			dataFieldCount++;
-			thisElem = document.getElementById(GetHeaders[i].innerHTML + thisRow);
-			//window.alert(thisElem.value + "-" + thisRow);
-			if (thisElem.value != "") {
-				newData = thisElem.value;
-			}else {
-				//newData = thisElem.innerHTML;
-			}
-			if (newData != "") {
-				dataCount++;
-				//window.alert(newData);
-			}
-			if (sendData == "") {
-				sendData = newData;
-			}else {
-				sendData = sendData + "," + newData;
-			}
+		if (TheseElements[i].innerText == "") {
+			newData = TheseElements[i].children[0].value;
+		}else {
+			newData = TheseElements[i].innerText
+		}
+		dataFieldCount++;
+		if (newData != "") {
+			dataCount++;
+		}
+		if (sendData == "") {
+			sendData = newData;
+		}else {
+			sendData = sendData + "," + newData;
 		}
 	}
 	if ((buttonCaption == "Add" || buttonCaption == "New") && action == "Amend") {
@@ -317,7 +328,7 @@ function onMessage(evt)
 					if (document.getElementById("detail-table") != null) {
 						document.getElementById("detail-table").innerHTML = "";
 					}
-					createButton(thismessage[2],thismessage[2],"submenu-row","doSend","doAction=" + thismessage[2],thismessage[3]); 
+					createButton(thismessage[2],thismessage[2],"submenu-row","doSend","getDetail=" + thismessage[2],thismessage[3]); 
 				}
 				break;
 			case "DETAIL":
@@ -353,14 +364,15 @@ function onMessage(evt)
 						}
 						break;
 					case "LINE":
-						i//window.alert("yep");
-						var newTR=document.createElement("TR");
-						newTR.setAttribute("colspan","100");
-						var newHR=document.createElement("HR");
-						newTR.appendChild(newHR);
-						document.getElementById("detail-table").appendChild(newTR);
+						//window.alert("yep");
+						createRow("detail" + thismessage[3],"detail-table","");
+						var countHeaders = elementCount();
+						for (var i = 0; i < countHeaders; i++) {
+							//window.alert("detail" + thismessage[3] + "-row");
+							createElement("","LINE","","detail" + thismessage[3] + "-row","","");
+						}
 						break;
-						//createSeperator("detail","yellow");
+
 					default:
 						//add data row
 						//Message receved format: DETAIL,menu context (zfs,VPN,etc.),row counter,info......

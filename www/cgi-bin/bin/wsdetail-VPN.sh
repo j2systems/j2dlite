@@ -9,12 +9,13 @@ echo "DETAIL,VPN,STYLES,gray,gray,gray,gray,gray,gray,green:yellow,red:"
 COUNT=1
 THISIFS=$IFS
 IFS=","
-while read NAME URL USERNAME PASSWORD TOKEN DEFGROUP 
+while read -u3 NAME URL USERNAME PASSWORD TOKEN DEFGROUP 
 do
-	#THESEGROUPS=$(get_vpngroups ${URL})
-	THESEGROUPS="DC02-AnyConnect-RemoteAccess Remote Split Other"
+	unset THESEGROUPS
+	THESEGROUPS=$(get_vpngroups "${URL}")
+	[[ "${DEFGROUP}" == "(Default)" ]] && DEFGROUP=$(echo ${THESEGROUPS}|cut -d " " -f1) && log "defgroup: ${DEFGROUP}-bob"
 	echo "DETAIL,VPN,${COUNT},${NAME},${URL},${USERNAME},${PASSWORD},${TOKEN}:true false,${DEFGROUP}:${THESEGROUPS}"
 	COUNT=$((++COUNT))
-done < ${SYSTEMPATH}/wsdetail_VPN
+done 3<${SYSTEMPATH}/wsdetail_VPN
 IFS=${THISIFS}
-echo "DETAIL,VPN,${COUNT},,,,,false:true false,Default:Default "
+echo "DETAIL,VPN,${COUNT},,,,,false:true false,(Default):(Default)"

@@ -2,7 +2,7 @@
 #
 # Script to check requesting client for integration
 # 1. Checks /etc/hosts.
-# 2. Checks config/wsdetail_MClients_declined
+# 2. Checks system/wsdetail_MClients_declined
 # 3. If not in wsdetail_MClients_declined, tries an ssh for hostname
 # 4. If hostname present, ssh successful therefore previously managed, 
 #	ip/hostname added to /etc/hosts, true sent to websocket.
@@ -25,6 +25,9 @@ do
 		chmod 666 ${SYSTEMPATH}/${REFERENCE}
 	fi
 done
+THISIFS=$IFS
+IFS=","
+
 # check /etc/hosts
 if [[ $(grep -c -e "^${CHECKHOSTIP} " /etc/hosts) -eq 0 ]]
 then
@@ -33,8 +36,8 @@ then
 	then
 		# try ssh to wsdetail_MClients list
 		KNOWNHOST=false                                   
-		while read HOST USERNAME TYPE STUDIO ATELIER                       
-		do      
+		while read -u3 HOST USERNAME TYPE STUDIO ATELIER                       
+		do 
 			if [[ "${KNOWNHOST}" == "false" ]]                              
 			then
 				if [[ "${TYPE}" == "${MANHOSTTYPE}" ]]
@@ -50,7 +53,7 @@ then
 					fi
 				fi                                                      
 			fi                                                              
-		done < <(cat ${SYSTEMPATH}/wsdetail_MClients)                          
+		done 3<${SYSTEMPATH}/wsdetail_MClients                         
 		echo ${KNOWNHOST}
 	else
 		echo "true"
@@ -58,3 +61,4 @@ then
 else
 	echo "true"
 fi
+IFS=$THISIFS
