@@ -39,7 +39,7 @@ then
 		sed  -i "/${NEWHOSTNAME}/d" ${SYSTEMPATH}/wsdetail_MClients 
 		add_host ${MCHOSTIP} ${NEWHOSTNAME}
 		ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${NEWHOSTNAME} hostname
-		echo "${NEWHOSTNAME} ${MCUSERNAME} ${MCHOSTTYPE} true ${MCSTUDIO} ${MCATELIER}" >> ${SYSTEMPATH}/wsdetail_MClients
+		echo "${NEWHOSTNAME},${MCUSERNAME},${MCHOSTTYPE},true,${MCSTUDIO},${MCATELIER}" >> ${SYSTEMPATH}/wsdetail_MClients
 		if [[ "${MCHOSTTYPE}" == "WINDOWS" ]]
 		then
 			echo "Transferring management script"
