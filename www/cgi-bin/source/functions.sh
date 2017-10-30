@@ -77,8 +77,8 @@ mcmanage(){
 	local ACTION=$3
 	local MCDETAIL=$(grep -e "^${MCHOST}," ${SYSTEMPATH}/wsdetail_MClients)
 	[[ "${MCDETAIL}" == "" ]] && log "mcmanage failed to get ${MCHOST} details." && return 1
-	local USERNAME=$(echo ${MCDETAIL}|cut -d "," -f 2)
-	local MCTYPE=$(echo ${MCDETAIL}|cut -d "," -f 3)
+	local USERNAME=$(echo "${MCDETAIL}"|cut -d "," -f 2)
+	local MCTYPE=$(echo "${MCDETAIL}"|cut -d "," -f 3)
 	log "${MCHOST} ${COMMAND} ${ACTION}, (${MCTYPE}), $4 $5 $6 $7"
 	[[ "${HOSTNAME}" == "$4" ]] && HOSTNAME=${HOSTNAME}-admin
 	[[ "${MCTYPE}" == "WINDOWS" ]] && HOSTNAME=$(echo ${HOSTNAME}|unix2dos)
