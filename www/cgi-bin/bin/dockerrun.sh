@@ -62,5 +62,4 @@ rm -f ${TMPPATH}/run
 echo "Connectivity updating..."
 echo "SCRIPT END"
 bash ${BINPATH}/mclientupdate.sh
-bash ${BINPATH}/zfs-status.sh
 dockerlogout

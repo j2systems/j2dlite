@@ -42,6 +42,5 @@ then
 	echo "SCRIPT END"
 	rm -f ${TMPPATH}/run 
 	bash ${BINPATH}/mclientupdate.sh
-	bash ${BINPATH}/zfs-status.sh
 	dockerlogout
 fi

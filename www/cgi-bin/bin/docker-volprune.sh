@@ -72,4 +72,3 @@ log "...completed. Calling zfs update."
  
 # Update zfs info
 
-bash ${BINPATH}/zfs-status.sh

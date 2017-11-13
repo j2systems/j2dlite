@@ -179,6 +179,6 @@ ln -s /usr/local/etc/ssl/certs /etc/ssl
 #Start websocket, job listener, apache, zfs and docker 
 echo "Starting interaction services"                             
 nohup /var/www/cgi-bin/bin/init.sh >> /var/log/system.log & 
-
+bash ${BINPATH}/dockerhub.sh
 echo "http://${HOSTIP}/"
 
