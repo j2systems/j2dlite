@@ -219,7 +219,8 @@ function doTask(detail)
 			if (dataCount == dataFieldCount) {
 				doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
 			}else {
-				window.alert("All fields require data:" + dataCount);
+			
+				//window.alert("All fields require data:" + dataCount);
 			}	
 		}
 	}
