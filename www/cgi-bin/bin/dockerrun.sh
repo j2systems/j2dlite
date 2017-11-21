@@ -22,7 +22,7 @@ do
 		CALLED=$(echo ${DETAIL}|cut -d "=" -f2|tr "+" " ")
 		for HOST in ${CALLED}
 		do
-			. tmp/globals
+			. ${TMPPATH}/globals
 			if [[ $(echo ${CONTAINERS}|grep -c ${HOST}) -eq 1 ]]
 			then
 				echo "Cannot run ${IMAGETORUN} as ${HOST}.  ${HOST} is already in use"
@@ -37,7 +37,7 @@ do
 					. ${BINPATH}/image_array.sh
 				fi
 				echo "Spinning up ${HOST}"
-				. tmp/globals
+				. ${TMPPATH}/globals
 				echo "Entrypoint: $(docker inspect --format='{{json .Config.Entrypoint}}' $IMAGENAME|tr -d "[]")"
 				ENTRYPOINT=$(docker inspect --format='{{json .Config.Entrypoint}}' $IMAGENAME|tr -d " []\"")
 				if [[ "${ENTRYPOINT}" == "" || "${ENTRYPOINT}" == "null" ]]

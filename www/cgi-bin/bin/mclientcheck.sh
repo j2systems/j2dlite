@@ -62,3 +62,4 @@ else
 	echo "true"
 fi
 IFS=$THISIFS
+bash ${BINPATH}/dockerhub.sh
