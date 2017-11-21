@@ -17,7 +17,7 @@ bash ${BINPATH}/job-runner.sh &
 ntpd -q -p 0.uk.pool.ntp.org
 
 #Start apache                                                                              
-apachectl -k start 
+#apachectl -k start 
 
 # Start Docker
 export DOCKER_RAMDISK=true                                                                 
@@ -29,6 +29,9 @@ do
 	sleep 1
 	DOCKERSTATUS=$(docker info 2>&1|grep -c CPU)
 done
+
+#Start apache
+apachectl -k start
 
 #configure networking and iptables
 bash ${BINPATH}/networking.sh

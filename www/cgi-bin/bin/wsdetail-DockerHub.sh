@@ -22,4 +22,4 @@ then
 	echo "DETAIL,DockerHub,${COUNT},,,,"
 fi
 IFS=$THISIFS
-bash ${BIN}/dockerhub.sh
+bash ${BINPATH}/dockerhub.sh

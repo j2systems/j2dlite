@@ -182,7 +182,11 @@ function doTask(detail)
 	actualCount = elementCount();
 
 	//window.alert(actualCount)
-	buttonCaption=(TheseElements[actualCount].innerText);
+	if (TheseElements[actualCount] != null) {
+		buttonCaption=(TheseElements[actualCount].innerText);
+	} else {
+		buttonCaption="";	
+	}
 	//window.alert(buttonCaption)
 	sendData = "";
 	dataFieldCount = 0;
@@ -204,17 +208,20 @@ function doTask(detail)
 			sendData = sendData + "," + newData;
 		}
 	}
-	if ((buttonCaption == "Add" || buttonCaption == "New") && action == "Amend") {
-		//window.alert("Have a send but there is an Add button")
-	}else {
-		//window.alert(action + "-" + item + ":" + thisRow + "..." + sendData + "..." + dataCount)
-		//check all fields not blank
-		if (dataCount == dataFieldCount) {
-			doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
+	if (action == "Amend") {
+		//if ((buttonCaption == "Add" || buttonCaption == "New") && action == "Amend") {
+		if (buttonCaption == "Add" || buttonCaption == "New") {
+			//window.alert("Have a send but there is an Add button")
 		}else {
-			window.alert("All fields require data:" + dataCount);
-		}	
-
+			//window.alert(action + "-" + item + ":" + thisRow + "..." + sendData + "..." + dataCount)
+			//check all fields not blank
+			//window.alert(dataCount + " - " + dataFieldCount);
+			if (dataCount == dataFieldCount) {
+				doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
+			}else {
+				window.alert("All fields require data:" + dataCount);
+			}	
+		}
 	}
 }
 
