@@ -118,7 +118,8 @@ function createElement(name,type,value,targetelement,style,context)
 			newSelect.setAttribute("id",name);
 			newSelect.setAttribute("onchange",'doTask("' + context + '=Amend,' + name + '")');
 			options = theseDetails[1].split(" ");
-			for (var option of options) {
+//			for (var option of options) {
+			options.forEach(function(option) {
 				var newOPT = document.createElement("OPTION");
 				newOPT.value = option;
 				newOPT.innerHTML = option;
@@ -126,7 +127,7 @@ function createElement(name,type,value,targetelement,style,context)
 					newOPT.selected=true;
 				}
 				newSelect.appendChild(newOPT);
-			}
+			});
 			newTD.appendChild(newSelect);
 			break;
 		case "BUTTON":
