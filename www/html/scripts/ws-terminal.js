@@ -116,7 +116,8 @@ function onMessage(evt)
 	if (evt.data == "SCRIPT END") {
 		flash = false;
 	}else {
-		writeToScreen(event.data);	
+//		writeToScreen(event.data);	
+		writeToScreen(evt.data);	
 		document.getElementById("other").scrollTop = 1000000;
 	}	
 }

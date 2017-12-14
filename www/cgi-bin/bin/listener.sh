@@ -22,19 +22,7 @@ do
 			bash ${BINPATH}/wsinfo-sysoptions.sh "${DETAIL}"
 			;;
 		"getDetail")
-			case $DETAIL in
-				"Restart")
-					reboot
-					;;
-				"SHUTDOWN")
-					docker stop $(docker ps -q)
-					${BINPATH}/mclientupdate.sh
-					poweroff
-					;;
-				*)
-					[[ -f ${BINPATH}/wsdetail-${DETAIL}.sh ]] && bash ${BINPATH}/wsdetail-${DETAIL}.sh
-					;;
-			esac
+			[[ -f ${BINPATH}/wsdetail-${DETAIL}.sh ]] && bash ${BINPATH}/wsdetail-${DETAIL}.sh
 			;;
 		"containerstatus")
 			bash ${BINPATH}/container-status.sh
@@ -100,8 +88,8 @@ do
 			echo "${REMOTE_ADDR},docker ${ACTION} ${DETAIL}" > ${JOBREQUESTPATH}/${FILENAME}
 			;;	
 		"post")
-			RTNDETAIL=$DETAIL
-			write_global RTNDETAIL
+			RTNCONTAINER=$DETAIL
+			write_global RTNCONTAINER
 			;;
 		"checkclient")
 			bash ${BINPATH}/mclientcheck.sh ${DETAIL}

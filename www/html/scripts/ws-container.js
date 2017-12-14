@@ -156,10 +156,11 @@ function updateButtonRow(containerData)
 		if (containerData[4] == "true") {
 			newButtons = ["Stop","Console","CacheCon","CacheRtn","CacheSMP","ExecScript"];
 		}else {
-			newButtons = ["Stop","Console","ExecScript"]
+			newButtons = ["Stop","Console","ExecScript"];
 		}
 	}
-	for (var thisButton of newButtons) {
+//	for (var thisButton of newButtons) {
+	newButtons.forEach(function(thisButton) {
 		buttonID = thisButton.toLowerCase();
 		var newTD = document.createElement("TD");
 		newTD.setAttribute("id", buttonID + '-' + containerName);
@@ -171,7 +172,7 @@ function updateButtonRow(containerData)
 		newbtn.setAttribute("class", 'button button' + buttonID);
 		newTD.appendChild(newbtn);
 		document.getElementById('buttonbar-' + containerName).appendChild(newTD);
-	}	
+	});	
 }
 
 function updateDetails(thismessage)
@@ -181,7 +182,8 @@ function updateDetails(thismessage)
 	thisCommand=thismessage[2];
 	theseSubCommands=thisCommand.split(" ");
 	thisAction=theseSubCommands[1];
-	if (theseSubCommands[2].includes("=")) {
+//	if (theseSubCommands[2].includes("=")) {
+	if (theseSubCommands[2].indexOf("=") > 0) {
 		thisContainerDetail = theseSubCommands[2].split("=");
 		thisContainer = thisContainerDetail[0];
 	}else {
