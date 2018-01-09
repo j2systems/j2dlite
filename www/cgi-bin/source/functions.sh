@@ -97,11 +97,11 @@ mcmanage(){
 				then
 					# Cannot sed -i so copy hosts, amend, copy back
 					scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
-					sed -i "/\t$4\t/d" /tmp/hosts
+					sed -i "/$4 #/d" /tmp/hosts
 					scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
 					rm /tmp/hosts
 				fi
-				ssh ${USERNAME}@${MCHOST} "echo \"$5\t$4\t#${HOSTNAME}#\" >> /etc/hosts"
+				ssh ${USERNAME}@${MCHOST} "echo \"$5 $4 #${HOSTNAME}#\" >> /etc/hosts"
 				;;
 			*)
 				log "mcmange unhandled - $1,$2,$3,$4,$5,$6,$7,$8"
@@ -115,7 +115,7 @@ mcmanage(){
 				;;
 			"MAC"|"LINUX")
 				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
-			        sed -i "/\t$6\t/d" /tmp/hosts
+			        sed -i "/ $6 /d" /tmp/hosts
 				scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
 				rm /tmp/hosts
 				;;
@@ -131,7 +131,7 @@ mcmanage(){
 				;;
 			"MAC"|"LINUX")
 				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
-				sed -i "/\t#${HOSTNAME}#$/d" /tmp/hosts
+				sed -i "/#${HOSTNAME}#$/d" /tmp/hosts
 				scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
 				rm /tmp/hosts
 				;;

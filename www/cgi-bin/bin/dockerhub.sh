@@ -2,7 +2,7 @@
 #
 # Creates list of images on docker hub
 . /var/www/cgi-bin/tmp/globals
-[[ ! -f ${SYSTEMPATH}/wsdetail_DockerHub ]] && touch  ${SYSTEMPATH}/wsdetail_DockerHub
+[[ ! -f ${SYSTEMPATH}/wsdetail_DockerHub ]] && echo "#" >> ${SYSTEMPATH}/wsdetail_DockerHub
 if [[ -f /var/www/cgi-bin/tmp/dockerhub ]]
 then
 	rm /var/www/cgi-bin/tmp/dockerhub
