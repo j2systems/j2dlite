@@ -23,13 +23,24 @@ then
         done
 fi
 
+for THISPORT in $(cat /var/www/cgi-bin/system/wsdetail_Ports)
+do
+	append_global PORTS $THISPORT
+done
+
 # Read current PORTS and add to public and DOCKER firewall rules if required.
 . /var/www/cgi-bin/tmp/globals
 
 for CHAIN in DOCKER
 do
 	#Allow ping
-	iptables -A ${CHAIN} -p icmp -s 0/0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+	
+	if [[ "$(iptables -n -L ${CHAIN}|grep icmp)" == "" ]]
+	then
+		iptables -A ${CHAIN} -p icmp -s 0/0 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+	
+	fi
+	
 	for PORT in $PORTS
 	do
 		if [[ $(iptables -n -L $CHAIN|grep -c $PORT) -eq 0 ]]

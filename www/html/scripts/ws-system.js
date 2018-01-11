@@ -52,7 +52,7 @@ function onError(evt)
 
 function doSend(message)
 {
-	websocket.send(message);
+		websocket.send(message);
 }
 
 function createTable(thisDIV)
@@ -188,7 +188,7 @@ function doTask(detail)
 	} else {
 		buttonCaption="";	
 	}
-	//window.alert(buttonCaption)
+	//window.alert(buttonCaption+","+action)
 	sendData = "";
 	dataFieldCount = 0;
 	dataCount = 0;
@@ -209,22 +209,21 @@ function doTask(detail)
 			sendData = sendData + "," + newData;
 		}
 	}
-	if (action == "Amend") {
-		//if ((buttonCaption == "Add" || buttonCaption == "New") && action == "Amend") {
-		if (buttonCaption == "Add" || buttonCaption == "New") {
-			//window.alert("Have a send but there is an Add button")
-		}else {
-			//window.alert(action + "-" + item + ":" + thisRow + "..." + sendData + "..." + dataCount)
-			//check all fields not blank
-			//window.alert(dataCount + " - " + dataFieldCount);
-			if (dataCount == dataFieldCount) {
-				doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
-			}else {
-			
-				//window.alert("All fields require data:" + dataCount);
-			}	
+	//window.alert(action);
+	switch(action) {
+	 	case "Amend":
+			if (buttonCaption == "Add" || buttonCaption == "New") {
+				if (dataCount == dataFieldCount) {
+					doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
+				}else {
+					//window.alert("All fields require data:" + dataCount);
+				}	
+			}
+			break;
+		case "Remove":
+			doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
 		}
-	}
+	
 }
 
 

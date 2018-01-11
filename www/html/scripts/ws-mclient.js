@@ -78,8 +78,8 @@ function removeElement(name)
  
 function onMessage(evt)
 {
-	var clientstatus=evt.data;
-	if (clientstatus == "false") {
+	var clientstatus=evt.data.split("=");
+	if (clientstatus[1] == "false") {
 		document.getElementById("MC").innerHTML="<td>New client detected.  Add " + myip + " as Management Host?</td>";
 		createButton("Yes","Yes","MC","acceptHost",myip,"button yellow");
 		createButton("No","No","MC","declineHost",myip,"button yellow");

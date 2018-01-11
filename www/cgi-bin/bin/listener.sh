@@ -8,7 +8,10 @@ while :
 do
 	unset COMMAND
 	unset DOTHIS
-	read DOTHIS
+	until [[ ${DOTHIS} != "" ]]
+	do 
+		read DOTHIS
+	done
 	. ${TMPPATH}/globals
 	log "RUN ${DOTHIS}"
 	ACTION=$(echo $DOTHIS|cut -d "=" -f1)
@@ -63,7 +66,12 @@ do
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
 				Amend)
-					sed -i "${DATAROW}s#.*#${INFO}#" ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					if [[ $(sed -n -${DATAROW}p ${SYSTEMPATH}/wsdetail_${CONTEXT}) == "" ]]
+					then
+						echo ${INFO} >> ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					else
+						sed -i "${DATAROW}s#.*#${INFO}#" ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					fi
 					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
@@ -110,8 +118,8 @@ do
 			bash ${BINPATH}/${EXECSCRIPT} "${EXECPARAM}" 
 			;;
 		*)
-			log "RESEND $DOTHIS"
-			echo "RESEND $DOTHIS"
+			log "Received $DOTHIS, #$ACTION#"
+			#echo "RESEND $DOTHIS"
 			;;
 	esac
 done

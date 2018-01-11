@@ -54,12 +54,15 @@ then
 				fi                                                      
 			fi                                                              
 		done 3<${SYSTEMPATH}/wsdetail_MClients                         
-		echo ${KNOWNHOST}
+		echo "mclient=${KNOWNHOST}"
+		log "client checked and returned  ${KNOWNHOST}" 
 	else
-		echo "true"
+		echo "mclient=true"
+		log "client listed in ${SYSTEMPATH}/wsdetail_MClients_declined"
 	fi
 else
-	echo "true"
+	log "client listed in /etc/hosts"
+	echo "mclient=true"
 fi
 IFS=$THISIFS
-bash ${BINPATH}/dockerhub.sh
+#bash ${BINPATH}/dockerhub.sh
