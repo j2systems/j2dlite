@@ -10,6 +10,7 @@ done < <(docker ps -a --format "{{.Names}}")
 
 sed -i "s/&/\n/g" ${TMPPATH}/run
 INTEGRATE=false
+[[ "$(docker volume ls|grep common)" == "" ]] && docker volume create common
 while read DETAIL
 do
 	if [[ $(echo "$DETAIL"|grep -c "INT") -eq 0 && "$(echo $DETAIL|cut -d "=" -f1)" != "RUN" ]]
@@ -42,16 +43,16 @@ do
 				ENTRYPOINT=$(docker inspect --format='{{json .Config.Entrypoint}}' $IMAGENAME|tr -d " []\"")
 				if [[ "${ENTRYPOINT}" == "" || "${ENTRYPOINT}" == "null" ]]
 				then
-					echo "docker run -id --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host $IMAGENAME /bin/sh"
-					docker run -itd --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host $IMAGENAME /bin/sh 2>&1
+					echo "docker run -id --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host -v common:/common $IMAGENAME /bin/sh"
+					docker run -itd --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host -v common:/common $IMAGENAME /bin/sh 2>&1
 				else
 					if [[ "$ENTRYPOINT" == "/sbin/pseudo-init" ]]
 					then
-						echo "docker run -d --name $HOST -h $HOST --network j2docker -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri $IMAGENAME"
-						docker run -d --name $HOST -h $HOST --network j2docker -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri $IMAGENAME 2>&1
+						echo "docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri $IMAGENAME"
+						docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri $IMAGENAME 2>&1
 					else
-						echo "docker run -d --name $HOST -h $HOST --network j2docker -v $SHAREDIR:/mnt/host $IMAGENAME"
-						docker run -d --name $HOST -h $HOST --network j2docker -v $SHAREDIR:/mnt/host $IMAGENAME
+						echo "docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host $IMAGENAME"
+						docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host $IMAGENAME
 					fi
 				fi
 			fi	

@@ -10,7 +10,7 @@ CACHEROUTINEFILE=$(echo $1|cut -d "," -f3)
 
 
 	CACHEROUTINEPATH=$(echo ${CACHEROUTINEDIR}|sed "s,${SHAREDIR},/mnt/host,g")
-	IMPORTTHIS=$(echo ${CACHEROUTINEPATH}/${CACHEROUTINE}|sed "s,${SHAREDIR},/mnt,g")
+	IMPORTTHIS=$(echo ${CACHEROUTINEPATH}/${CACHEROUTINEFILE}|sed "s,${SHAREDIR},/mnt,g")
 
 #	Import
 
