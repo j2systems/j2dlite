@@ -6,7 +6,8 @@ source ${SOURCEPATH}/functions.sh
 
 echo $1
 MCUSERNAME=$(echo $1|cut -d "," -f1)
-MCPASSWORD=$(echo $1|cut -d "," -f2)
+THISPASSWORD=$(echo $1|cut -d "," -f2)
+MCPASSWORD=decodeURL($THISPASSWORD)
 MCHOSTTYPE=$(echo $1|cut -d "," -f3)
 MCHOSTIP=$(echo $1|cut -d "," -f4)
 MCSTUDIO=$(echo $1|cut -d "," -f5)

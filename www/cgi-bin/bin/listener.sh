@@ -66,7 +66,7 @@ do
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
 				Amend)
-					if [[ $(sed -n -${DATAROW}p ${SYSTEMPATH}/wsdetail_${CONTEXT}) == "" ]]
+					if [[ $(sed -n ${DATAROW}p ${SYSTEMPATH}/wsdetail_${CONTEXT}) == "" ]]
 					then
 						echo ${INFO} >> ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					else
