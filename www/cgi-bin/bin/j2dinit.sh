@@ -170,6 +170,11 @@ then
 
 		VirtualBox)
 			sudo -u tc tce-load -i vboxsf.tcz
+			for VBOXSHARE in $(VBoxControl sharedfolder list|grep " - "|cut -d "-" -f2|tr -d " ")
+			do
+				mkdir -p /mnt/shared/$VBOXSHARE
+				mount -t vboxsf $VBOXSHARE /mnt/shared/$VBOXSHARE
+			done
 			;;
 	esac
 fi

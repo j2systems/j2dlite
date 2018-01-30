@@ -43,7 +43,8 @@ case "${REQUEST_METHOD}" in
 			echo "<td class=\"filelisting yellow\">$VALUE</td></tr>"
 			echo "<form action=\"./terminal.cgi\" method=\"POST\">"
 			echo "<tr><td class=\"filelisting yellow\">Namespace</td><td><select name=\"namespace\">"
-			for NS in $(docker exec $RTNCONTAINER /bin/sh -c "echo -e \"_SYSTEM\nj2andUtoo\nD ##class(%SYS.Namespace).ListAll(.result) zw result\nh\n\"|csession hs|grep result|grep -Fv "^"|cut -d \"\\\"\" -f2")
+			DEFINSTANCE=$(docker exec $RTNCONTAINER ccontrol list|grep "(default)"|cut -d "'" -f2)
+			for NS in $(docker exec $RTNCONTAINER /bin/sh -c "echo -e \"_SYSTEM\nj2andUtoo\nD ##class(%SYS.Namespace).ListAll(.result) zw result\nh\n\"|csession ${DEFINSTANCE}|grep result|grep -Fv "^"|cut -d \"\\\"\" -f2")
 			do
 				echo "<option value=\"$NS\">$NS</option>"
 			done
