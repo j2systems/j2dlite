@@ -432,7 +432,7 @@ isHS(){
 	fi
 }
 
-# 3.2.2.1 Is it RDP?
+# 3.2.2.2 Is it RDP?
 
 isRDP(){
 	# Using entrypoint set as /sbin/rdp to determine
@@ -452,8 +452,6 @@ isRDP(){
 decodeURL() {
 	printf "$(echo $1|sed 's/+/ /g;s/%\(..\)/\\x\1/g;')";
 }
-
-
 
 ################################################################################
 #
