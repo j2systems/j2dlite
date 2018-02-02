@@ -10,7 +10,7 @@ source ${SOURCEPATH}/functions.sh
  	log "docker stop ${STOPCONTAINER}" 
 	docker stop ${STOPCONTAINER} 2>&1 
 	bash ${BINPATH}/mclientupdate.sh
-	bash ${BINPATH}/docker-volprune.sh
+#	bash ${BINPATH}/docker-volprune.sh
 	JOBSTATUS="complete"
 	write_global JOBSTATUS
 	delete_global STOPCONTAINER
