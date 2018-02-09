@@ -9,4 +9,4 @@ log "remove $1 in 3 s..."
 sleep 3s
 log "remove $1 now"
 rm -rf ${JOBSTATUSPATH}/$1
-bash ${BINPATH}/docker-volprune.sh
+#bash ${BINPATH}/docker-volprune.sh
