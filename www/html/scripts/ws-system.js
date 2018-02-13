@@ -118,7 +118,7 @@ function createElement(name,type,value,targetelement,style,context)
 			newSelect.setAttribute("id",name);
 			newSelect.setAttribute("onchange",'doTask("' + context + '=Amend,' + name + '")');
 			options = theseDetails[1].split(" ");
-//			for (var option of options) {
+
 			options.forEach(function(option) {
 				var newOPT = document.createElement("OPTION");
 				newOPT.value = option;
@@ -181,7 +181,7 @@ function doTask(detail)
 	TheseElements = document.getElementById("detail" + thisRow + "-row").children;
 	headerCount = GetHeaders.length;
 	actualCount = elementCount();
-
+	console.log(detail);
 	//window.alert(actualCount)
 	if (TheseElements[actualCount] != null) {
 		buttonCaption=(TheseElements[actualCount].innerText);
@@ -216,16 +216,19 @@ function doTask(detail)
 				if (dataCount == dataFieldCount) {
 					doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
 				}else {
-					window.alert("All fields require data:" + dataCount);
+					//window.alert("All fields require data:" + dataCount);
 				}
 			}else {
 				window.alert("Dep check wsdetail.js 222 " + "SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);	
 				doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);	
 			}
 			break;
+		case "Update":
 		case "Remove":
 			doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
+			break
 		}
+		
 	
 }
 
