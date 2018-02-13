@@ -219,7 +219,7 @@ function doTask(detail)
 					//window.alert("All fields require data:" + dataCount);
 				}
 			}else {
-				window.alert("Dep check wsdetail.js 222 " + "SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);	
+				console.log("Dep check wsdetail.js 222 " + "SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);	
 				doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);	
 			}
 			break;
