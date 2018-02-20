@@ -224,6 +224,9 @@ function doTask(detail)
 			}
 			break;
 		case "Update":
+		case "Clone":
+		case "Unclone":
+		case "Refresh":
 		case "Remove":
 			doSend("SysReq=" + action + "," + item + "," + thisRow + ":" + sendData);
 			break

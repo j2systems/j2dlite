@@ -72,7 +72,7 @@ do
 					else
 						sed -i "${DATAROW}s#.*#${INFO}#" ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					fi
-					sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					#sort -n ${SYSTEMPATH}/wsdetail_${CONTEXT} -o ${SYSTEMPATH}/wsdetail_${CONTEXT}
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
 				Remove)
@@ -81,6 +81,24 @@ do
 					;;
 				Connect)
 					log "SysReq Connect ${CONTEXT} ${DATAROW} ${INFO}"
+					;;
+				Clone)
+					log "SysReq Clone ${CONTEXT} -${DATAROW}-${INFO}"
+					# git clone
+					bash ${BINPATH}/wsdetail-wait.sh
+					bash ${BINPATH}/git-clone.sh $(echo ${INFO}|tr "," " ") 
+
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
+					;;
+				Refresh)
+					log "SysReq Refresh ${CONTEXT} -${DATAROW}-${INFO}"
+					bash ${BINPATH}/git-refresh.sh $(echo ${INFO}|tr "," " ")
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
+					;;
+				Unclone)
+					log "SysReq Unclone ${CONTEXT} -${DATAROW}-${INFO}"
+					bash ${BINPATH}/git-unclone.sh $(echo ${INFO}|tr "," " ")
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
 				*)
 					log "SysReq No handler - ${COMMAND}"

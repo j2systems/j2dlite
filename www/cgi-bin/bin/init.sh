@@ -20,6 +20,7 @@ ntpd -q -p 0.uk.pool.ntp.org
 #apachectl -k start 
 
 # Start Docker
+
 export DOCKER_RAMDISK=true                                                                 
 dockerd &
 DOCKERSTATUS=$(docker info 2>&1|grep -c CPU)
