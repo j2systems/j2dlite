@@ -13,14 +13,15 @@ INTEGRATE=false
 [[ "$(docker volume ls|grep common)" == "" ]] && docker volume create common
 while read DETAIL
 do
-	if [[ $(echo "$DETAIL"|grep -c "INT") -eq 0 && "$(echo $DETAIL|cut -d "=" -f1)" != "RUN" ]]
-	then
-        	if [[ "$(echo $DETAIL|cut -d "=" -f2)" != "" ]] 
-        	then
-			THISIMAGE=$(echo $DETAIL|cut -d "=" -f1|sed "s,_FSLASH_,/,g"|sed "s,_COLON_,:,g")
-        	fi
-		IMAGENAME=${THISIMAGE}
-		CALLED=$(echo ${DETAIL}|cut -d "=" -f2|tr "+" " ")
+	ROWREFERENCE=$(echo ${DETAIL}|cut -d "=" -f1)
+	NAMES=$(echo ${DETAIL}|cut -d "=" -f2)
+	if [[ "${ROWREFERENCE}" != "RUN" &&  "${NAMES}" != "" ]]
+	then	
+		THISIMAGE=$(sed "${ROWREFERENCE}q;d" ${TMPPATH}/images)
+		REPONAME=$(echo ${THISIMAGE}|cut -d " " -f1)
+		IMAGENAME=$(echo ${THISIMAGE}|cut -d " " -f2)
+		LOCATION=$(echo ${THISIMAGE}|cut -d " " -f3)
+		CALLED=$(echo ${NAMES}|cut -d "=" -f2|tr "+" " ")
 		for HOST in ${CALLED}
 		do
 			. ${TMPPATH}/globals
@@ -30,29 +31,40 @@ do
 			else
 				#add new hostname to global 
 				append_global NEWCONTAINERS ${HOST}
-				if [[ "$(imagelocation ${IMAGENAME})" == "REMOTE" ]]
+				if [[ "${LOCATION}" == "REMOTE" ]]
 				then
 					dockerlogin
 					echo "Pulling image from repository"
 					docker pull ${IMAGENAME} 2>&1
 					. ${BINPATH}/image_array.sh
 				fi
+				if [[ "${LOCATION}" == "GITLAB" ]]
+				then
+					THISUSER=$(head -n 1 /var/www/cgi-bin/system/wsdetail_GitLab|cut -d "," -f1)
+					THISPASS=$(head -n 1 /var/www/cgi-bin/system/wsdetail_GitLab|cut -d "," -f2)
+					docker login -u ${THISUSER} -p ${THISPASS} https://gitlab.j2interactive.com:5002
+					echo "docker pull ${REPONAME}:${IMAGENAME}"
+					docker pull ${REPONAME}:${IMAGENAME}
+					docker logout
+					unset THISPASS
+					unset THISUSER
+				fi
 				echo "Spinning up ${HOST}"
 				. ${TMPPATH}/globals
-				echo "Entrypoint: $(docker inspect --format='{{json .Config.Entrypoint}}' $IMAGENAME|tr -d "[]")"
-				ENTRYPOINT=$(docker inspect --format='{{json .Config.Entrypoint}}' $IMAGENAME|tr -d " []\"")
+				echo "Entrypoint: $(docker inspect --format='{{json .Config.Entrypoint}}' ${REPONAME}:${IMAGENAME}|tr -d "[]")"
+				ENTRYPOINT=$(docker inspect --format='{{json .Config.Entrypoint}}' ${REPONAME}:${IMAGENAME}|tr -d " []\"")
 				if [[ "${ENTRYPOINT}" == "" || "${ENTRYPOINT}" == "null" ]]
 				then
-					echo "docker run -id --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host -v common:/common $IMAGENAME /bin/sh"
-					docker run -itd --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host -v common:/common $IMAGENAME /bin/sh 2>&1
+					echo "docker run -id --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host -v common:/common ${REPONAME}:${IMAGENAME} /bin/sh"
+					docker run -itd --name $HOST -h $HOST  --network j2docker -v $SHAREDIR:/mnt/host -v common:/common ${REPONAME}:${IMAGENAME} /bin/sh 2>&1
 				else
 					if [[ "$ENTRYPOINT" == "/sbin/pseudo-init" ]]
 					then
-						echo "docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri $IMAGENAME"
-						docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri $IMAGENAME 2>&1
+						echo "docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri ${REPONAME}:${IMAGENAME}"
+						docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri ${REPONAME}:${IMAGENAME} 2>&1
 					else
-						echo "docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host $IMAGENAME"
-						docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host $IMAGENAME
+						echo "docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host ${REPONAME}:${IMAGENAME}"
+						docker run -d --name $HOST -h $HOST --network j2docker -v common:/common -v $SHAREDIR:/mnt/host ${REPONAME}:${IMAGENAME}
 					fi
 				fi
 			fi	

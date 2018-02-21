@@ -100,6 +100,10 @@ do
 					bash ${BINPATH}/git-unclone.sh $(echo ${INFO}|tr "," " ")
 					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
 					;;
+				ReSync)
+					echo ${INFO}|sed "s/done/none/g" > ${SYSTEMPATH}/wsdetail_${CONTEXT}
+					bash ${BINPATH}/wsdetail-${CONTEXT}.sh
+					;;
 				*)
 					log "SysReq No handler - ${COMMAND}"
 					;;

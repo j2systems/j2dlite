@@ -2,9 +2,9 @@
 . /var/www/cgi-bin/tmp/globals
 source ${SOURCEPATH}/functions.sh
 COMMONDIR=/var/lib/docker/volumes/common/_data
-echo "DETAIL,GitLab,REFRESH,Username,Password,Token,ID,Group,Repo,Branch,User,Date,Remove:Add,Clone,Switch,Refresh,Unclone"
-echo "DETAIL,GitLab,FIELDS,INPUT,PASSWORD,INPUT,TD,TD,TD,TD,TD,TD,BUTTON,BUTTON,BUTTON,BUTTON,BUTTON"
-echo "DETAIL,GitLab,STYLES,gray,gray,gray,gray,gray,gray,gray,gray,gray,red:green,yellow,yellow,green,red"
+echo "DETAIL,GitLab,REFRESH,Username,Password,Token,ID,Group,Repo,Branch,User,Date,Remove:Add,Clone,Switch,Refresh,Unclone,ReSync"
+echo "DETAIL,GitLab,FIELDS,INPUT,PASSWORD,INPUT,TD,TD,TD,TD,TD,TD,BUTTON,BUTTON,BUTTON,BUTTON,BUTTON,BUTTON"
+echo "DETAIL,GitLab,STYLES,gray,gray,gray,gray,gray,gray,gray,gray,gray,red:green,yellow,yellow,green,red,blue"
 THISIFS=$IFS
 IFS=","
 COUNT=1
@@ -16,7 +16,7 @@ do
 		then
 			# seed wsdetail_GitLab
 			sed -i "s/none/done/g" ${SYSTEMPATH}/wsdetail_GitLab
-			echo "DETAIL,GitLab,FIELDS,TD,PASSWORD,TD,TD,TD,TD,TD,TD,TD,HIDDEN,HIDDEN,HIDDEN,HIDDEN"
+			echo "DETAIL,GitLab,FIELDS,TD,PASSWORD,TD,TD,TD,TD,TD,TD,TD,HIDDEN,HIDDEN,HIDDEN,HIDDEN,BUTTON"
 			echo "DETAIL,GitLab,10000,${USERNAME},${PASSWORD},${TOKEN},Grabbing info from Gitlab.,Please wait ...,,,,"
 			curl -k https://gitlab.j2interactive.com/api/v4/projects?private_token=${TOKEN}|jq '.[]|"\(.id) \(.path_with_namespace)"'|tr -d "\"" > ${TMPPATH}/gitlab
 			bash ${BINPATH}/$(basename $0)
@@ -28,6 +28,10 @@ do
 				echo "${USERNAME},${PASSWORD},${TOKEN},${ID},${NAMESPACE},${REPONAME},none,none,none" >> ${SYSTEMPATH}/wsdetail_GitLab
 			done < ${TMPPATH}/gitlab 
 			IFS=${THISIFS}
+			echo "DETAIL,GitLab,FIELDS,TD,PASSWORD,TD,TD,TD,TD,TD,TD,TD,HIDDEN,HIDDEN,HIDDEN,HIDDEN,HIDDEN"
+			echo "DETAIL,GitLab,10000,${USERNAME},${PASSWORD},${TOKEN},Grabbing Docker info.,Please wait ...,,,,"
+			#Resync docker repos
+			bash ${BINPATH}/docker-GitLab.sh
 			bash ${BINPATH}/$(basename $0)
 			exit
 		
@@ -44,9 +48,9 @@ do
 				bash ${BINPATH}/$(basename $0)			
 				exit
 			else
-				echo "DETAIL,GitLab,FIELDS,TD,PASSWORD,TD,HIDDEN,HIDDEN,HIDDEN,HIDDEN,HIDDEN,HIDDEN,BUTTON,HIDDEN,HIDDEN,HIDDEN,HIDDEN"
+				echo "DETAIL,GitLab,FIELDS,TD,PASSWORD,TD,HIDDEN,HIDDEN,HIDDEN,HIDDEN,HIDDEN,HIDDEN,BUTTON,HIDDEN,HIDDEN,HIDDEN,HIDDEN,BUTTON"
 				echo "DETAIL,GitLab,${COUNT},${USERNAME},${PASSWORD},${TOKEN},${ID},${GROUP},${REPO},-,-,-"
-				echo "DETAIL,GitLab,FIELDS,HIDDEN,HIDDEN,HIDDEN,TD,TD,TD,TD,TD,TD,HIDDEN,BUTTON,HIDDEN,HIDDEN,HIDDEN"		
+				echo "DETAIL,GitLab,FIELDS,HIDDEN,HIDDEN,HIDDEN,TD,TD,TD,TD,TD,TD,HIDDEN,BUTTON,HIDDEN,HIDDEN,HIDDEN,HIDDEN"		
 			fi
 			COUNT=$((++COUNT))
 		else
@@ -55,7 +59,7 @@ do
 			
 			if [[ -d ${COMMONDIR}/GitLab/${GROUP}/${REPO} ]]
 			then
-				echo "DETAIL,GitLab,FIELDS,HIDDEN,HIDDEN,HIDDEN,TD,TD,TD,SELECT,TD,TD,HIDDEN,HIDDEN,BUTTON,BUTTON,BUTTON"
+				echo "DETAIL,GitLab,FIELDS,HIDDEN,HIDDEN,HIDDEN,TD,TD,TD,SELECT,TD,TD,HIDDEN,HIDDEN,BUTTON,BUTTON,BUTTON,HIDDEN"
 				REPODIR=$(find ${COMMONDIR}/GitLab/${GROUP}/${REPO} -maxdepth 1 -mindepth 1 -type d -name .git|rev|cut -d "/" -f2-|rev)
 				if [[ "${REPODIR}" != "" ]]
 				then
@@ -86,7 +90,7 @@ do
 					echo "DETAIL,GitLab,${COUNT},${USERNAME},${PASSWORD},${TOKEN},${ID},${GROUP},${REPO},${BRANCH}:${BRANCHLIST},${AUTHOR},${UPDATE}"
 				fi
 			else
-				echo "DETAIL,GitLab,FIELDS,HIDDEN,HIDDEN,HIDDEN,TD,TD,TD,TD,TD,TD,HIDDEN,BUTTON,HIDDEN,HIDDEN,HIDDEN"
+				echo "DETAIL,GitLab,FIELDS,HIDDEN,HIDDEN,HIDDEN,TD,TD,TD,TD,TD,TD,HIDDEN,BUTTON,HIDDEN,HIDDEN,HIDDEN,HIDDEN"
 				echo "DETAIL,GitLab,${COUNT},${USERNAME},${PASSWORD},${TOKEN},${ID},${GROUP},${REPO},-,-,-"
 			fi
 			COUNT=$((++COUNT))

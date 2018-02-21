@@ -36,7 +36,7 @@ do
 	if [[ $(echo ${NAME}|grep -c "@") -ne 0 ]]
 	then
 		THISZFSVOL=$(echo "${NAME}"|cut -d "@" -f1)
-		TYPE="clone"
+		TYPE="snapshot"
 	else
 		THISZFSVOL=${NAME}
 		TYPE="base"

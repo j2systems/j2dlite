@@ -8,6 +8,14 @@ do
         echo "$REP $TAG LOCAL $ID $SIZE" >> $IMAGES
 done < <( docker images --format "{{.Repository}} {{.Tag}} {{.ID}} {{.Size}}" 2>&1)
 
+while read REPO TAG
+do
+	if [[ $(grep -c "$REPO $TAG" $IMAGES) -eq 0 ]]
+	then
+		echo "$REPO $TAG GITLAB - unknown -" >> $IMAGES
+	fi
+done < tmp/dockergitlab	
+
 while read TAG SIZE DATE
 do
 	if [[ $(grep -c "j2systems/docker $TAG" $IMAGES) -eq 0 ]]

@@ -7,6 +7,7 @@ cat base/nav|sed "s/yellow screen2/green/g"
 echo "<table align=\"center\" width=\"100%\"><tr><td colspan=\"4\" align=\"center\" class=\"p\">Run Image(s) to create running containers.</td></tr><tr></tr>"
 echo "<tr><th>Repository</th><th>Tag</th><th>(Location)</th><th>Enter names here</th></tr>"
 echo "<form action="./terminal.cgi" method=\"POST\">"
+COUNT=1
 while read REP TAG LOCATION ID SIZE
 do
 	[[ "$REP" == "<none>" ]] && REP=$ID
@@ -23,8 +24,10 @@ do
 		echo "<td class=\"label label4 yellow\">$TAG</td>"
 		echo "<td class=\"label label3 yellow\">$LOCATION</td>"
 	fi
-	echo "<td class=\"label labelrest green\"><input type="text" name="${LABEL}_COLON_${TAG}" class=\"textbox green\"></td>"
+	#echo "<td><input type=\"hidden\" name=\"ROW\" value=\"${COUNT}\"></td>"
+	echo "<td class=\"label labelrest green\"><input type="text" name="${COUNT}" class=\"textbox green\"></td>"
 	echo "</tr>"
+	COUNT=$((${COUNT} + 1))
 done < tmp/images
 echo "<tr><td align=\"right\" colspan=\"4\"><input type=\"submit\" name=\"RUN\" value=\"Run\" class=\"button black\"\"></td></tr></table></form>"
 echo "<table width=\"100%\">"
