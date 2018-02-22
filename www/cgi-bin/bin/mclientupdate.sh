@@ -52,6 +52,18 @@ then
 				done
 				IFS=","
 				#hosts_add_nginx $TYPE
+				if [[ -f ${TMPPATH}/j2nginxlb.conf ]]
+				then
+					NGINXIP=$(get_container_ip nginx)
+					if [[ "${NGINXIP}" != "" ]]
+					then
+						cat ${TMPPATH}/j2nginxlb.conf|grep server_name|tr -s " \t"|cut -d " " -f2|tr -d ";" > ${TMPPATH}/lb
+						while read -u 4 HOSTENTRY
+						do
+							mcmanage ${MCHOST} hosts add ${HOSTENTRY} ${HOSTIP}
+						done 4<${TMPPATH}/lb
+					fi
+				fi
 			else
 				log "${MCHOST} marked as integrated but offline"
 			fi

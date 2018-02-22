@@ -47,8 +47,9 @@ then
 					if [[ "${RHOSTNAME}" != "" ]]                            
 					then    
 						KNOWNHOST=true                                  
-						add_host ${CHECKHOSTIP} ${RHOSTNAME}
+						#add_host ${CHECKHOSTIP} ${RHOSTNAME}
 						ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
+						mcmanage ${RHOSTNAME} hosts remove ${HOSTNAME}
 						mcmanage ${RHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 					fi
 				fi                                                      

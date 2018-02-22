@@ -10,48 +10,79 @@
 # Update hosts.
 
 THISPATH=/var/www/cgi-bin
-
-#source $THISPATH/source/functions.sh
-#[[ -f $THISPATH/tmp/j2nginx.conf ]] && rm -f $THISPATH/tmp/j2nginx.conf
-
-#while read NGINXTO URL PORTFROM PORTTO
-#do
-#	add_nginx_entry $NGINXTO $URL $PORTFROM $PORTTO
-#done < $THISPATH/tmp/nginx
-#chmod 777 ${THISPATH}/tmp/j2nginx.conf
-
-NGINXLBCONF=/var/www/cgi-bin/tmp/j2nginxlb.conf
-[[ -f ${NGINXLBCONF} ]] && rm -f ${NGINXLBCONF}
-while read URL LBNAME ALGORITHM HOSTS
+. /var/www/cgi-bin/tmp/globals
+source ${SOURCEPATH}/functions.sh
+NGINXLBCONF=${TMPPATH}/j2nginxlb.conf
+#[[ -f ${NGINXLBCONF} ]] && rm -f ${NGINXLBCONF}
+#[[ -f ${TMPPATH}/j2nginx.conf ]] && rm -f ${TMPPATH}/j2nginx.conf
+echo "http {" > ${NGINXLBCONF}
+THISIFS=$IFS
+IFS=","
+CURRENTURL=""
+while read TARGETURL TARGETPORT LBNAME ALGORITHM LBTARGET LBPORT LBWEIGHT
 do
-	ACTUALURL=$(echo ${URL}|cut -d ":" -f1)
-	URLPORT=$(echo ${URL}|cut -d ":" -f2)
-	echo -e "\tupstream ${LBNAME} {" >> ${NGINXLBCONF}
-	echo -e "\t\t${ALGORITHM};" >> ${NGINXLBCONF}
-	for DESTINATION in ${HOSTS}
-	do
-		THISSERVER=$(echo ${DESTINATION}|cut -d ":" -f1)
-		THISPORT=$(echo ${DESTINATION}|cut -d ":" -f2)
-		THISBACKUP=$(echo ${DESTINATION}|cut -d ":" -f3)
-		THISWEIGHT=$(echo ${DESTINATION}|cut -d ":" -f4)
-		[[ "$THISWEIGHT" != "" ]] && THISWEIGHT=" weight=${THISWEIGHT}"
-		echo -e "\t\tserver ${THISSERVER}:${THISPORT}${THISWEIGHT};" >> ${NGINXLBCONF}
-	done
+	#if read target url does not match current url
+	#if current url blank, start a new entry else finish existing and start new
+
+	if [[ "${TARGETURL}" != "${CURRENTURL}" ]]
+	then
+		if [[ "${CURRENTURL}" != "" ]]
+		then
+			#there's been a change in target url so close this nginx entry and start new
+			echo "Close entry"
+			echo -e "\t}" >> ${NGINXLBCONF}                                                         
+			echo -e "\tserver {" >> ${NGINXLBCONF}                                                  
+			echo -e "\t\tlisten ${CURRENTTPORT};" >> ${NGINXLBCONF}                                   
+			echo -e "\t\tserver_name ${CURRENTURL};" >> ${NGINXLBCONF}                               
+			echo -e "\t\tlocation / {"  >> ${NGINXLBCONF}                                           
+			echo -e "\t\t\tproxy_pass http://${CURRENTLBNAME};" >> ${NGINXLBCONF}                          
+			echo -e "\t\t}" >> ${NGINXLBCONF}                                                       
+			echo -e "\t}" >> ${NGINXLBCONF}
+		fi
+		echo "New Rule"
+		echo -e "\tupstream ${LBNAME} {" >> ${NGINXLBCONF}
+		echo -e "\t\t${ALGORITHM};" >> ${NGINXLBCONF}
+		echo -e "\t\tserver ${LBTARGET}:${LBPORT} weight=${LBWEIGHT};" >> ${NGINXLBCONF}
+		CURRENTURL=${TARGETURL}
+		CURRENTPORT=${TARGETPORT}
+		CURRENTLBNAME=${LBNAME}
+		write_global CURRENTURL
+	else
+		echo "append target"
+		#write_global TARGETURL
+		#write_global TARGETPORT
+		#write_global LBNAME
+		#write the entry for the target server
+		echo -e "\t\tserver ${LBTARGET}:${LBPORT} weight=${LBWEIGHT};" >> ${NGINXLBCONF}
+	fi
+	write_global TARGETURL
+	write_global TARGETPORT
+	write_global LBNAME
+done < ${SYSTEMPATH}/wsdetail_LoadBalance
+
+#if something was written, close it
+
+
+	. ${TMPPATH}/globals
+	
 	echo -e "\t}" >> ${NGINXLBCONF}
 	echo -e "\tserver {" >> ${NGINXLBCONF}
-	echo -e "\t\tlisten ${URLPORT};" >> ${NGINXLBCONF}
-	echo -e "\t\tserver_name ${ACTUALURL};" >> ${NGINXLBCONF}
+	echo -e "\t\tlisten ${TARGETPORT};" >> ${NGINXLBCONF}
+	echo -e "\t\tserver_name ${TARGETURL};" >> ${NGINXLBCONF}
 	echo -e "\t\tlocation / {"  >> ${NGINXLBCONF}
 	echo -e "\t\t\tproxy_pass http://${LBNAME};" >> ${NGINXLBCONF}
 	echo -e "\t\t}" >> ${NGINXLBCONF}
-	echo -e "\t}" >> ${NGINXLBCONF}
+	echo -e "\t}\n}" >> ${NGINXLBCONF}
+	delete_global TARGETURL
+	delete_global TARGETPORT
+	delete_global LBNAME
 
-done < $THISPATH/tmp/nginxlb	
-
-chmod 777 ${THISPATH}/tmp/j2nginxlb.conf
-docker cp ${THISPATH}/tmp/j2nginxlb.conf nginx:/etc/nginx/conf.d/j2nginxlb.conf
-docker exec -t nginx sh -c "service nginx stop"
-docker exec -t nginx nginx &
-docker exec -t nginx sh -c "service nginx reload"
-. ${THISPATH}/bin/mclientupdate.sh
+if [[ "$(get_container_ip nginx)" != "" ]]
+then
+	chmod 777 ${THISPATH}/tmp/j2nginxlb.conf
+	docker cp ${THISPATH}/tmp/j2nginxlb.conf nginx:/etc/nginx/conf.d/j2nginxlb.conf
+	docker exec -t nginx sh -c "service nginx stop"
+	docker exec -t nginx nginx &
+	docker exec -t nginx sh -c "service nginx reload"
+fi
 
