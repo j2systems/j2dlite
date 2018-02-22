@@ -60,7 +60,7 @@ then
 						cat ${TMPPATH}/j2nginxlb.conf|grep server_name|tr -s " \t"|cut -d " " -f2|tr -d ";" > ${TMPPATH}/lb
 						while read -u 4 HOSTENTRY
 						do
-							mcmanage ${MCHOST} hosts add ${HOSTENTRY} ${HOSTIP}
+							mcmanage ${MCHOST} hosts add ${HOSTENTRY} ${NGINXIP}
 						done 4<${TMPPATH}/lb
 					fi
 				fi
