@@ -98,14 +98,17 @@ mcmanage(){
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 HOSTS ADD $4 $5 ${HOSTNAME}"		
 				;;
 			"MAC"|"LINUX")
+				log "$4 #${DHOSTNAME}#"
 				if [[ $(ssh ${USERNAME}@${MCHOST} "cat /etc/hosts|grep -c -e \" $4 #${DHOSTNAME}#\"") -ne 0 ]]
 				then
+					log "remove"
 					# Cannot sed -i so copy hosts, amend, copy back
-					scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
-					sed -i "/$4 #/d" /tmp/hosts
-					scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
-					rm /tmp/hosts
+					#scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
+					sed -i "" "/$4 #/d" /tmp/hosts
+					#scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
+					#rm /tmp/hosts
 				fi
+				log "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
 				ssh ${USERNAME}@${MCHOST} "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
 				;;
 			*)

@@ -48,8 +48,8 @@ then
 					then    
 						KNOWNHOST=true
 						write_global KNOWNHOST
-						#add_host ${CHECKHOSTIP} ${RHOSTNAME}
-						#ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
+						add_host ${CHECKHOSTIP} ${RHOSTNAME}
+						ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
 						mcmanage ${RHOSTNAME} hosts remove ${HOSTNAME}
 						mcmanage ${RHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 					fi
