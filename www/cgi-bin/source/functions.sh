@@ -80,7 +80,12 @@ mcmanage(){
 	local USERNAME=$(echo "${MCDETAIL}"|cut -d "," -f 2)
 	local MCTYPE=$(echo "${MCDETAIL}"|cut -d "," -f 3)
 	log "${MCHOST} ${COMMAND} ${ACTION}, (${MCTYPE}), $4 $5 $6 $7"
-	[[ "${HOSTNAME}" == "$4" ]] && HOSTNAME=${HOSTNAME}-admin
+	if [[ "${HOSTNAME}" == "$4" ]] 
+	then
+		DHOSTNAME=${HOSTNAME}-admin
+	else
+		DHOSTNAME=${HOSTNAME}
+	fi
 	[[ "${MCTYPE}" == "WINDOWS" ]] && HOSTNAME=$(echo ${HOSTNAME}|unix2dos)
 	case ${COMMAND} in
 	"hosts")
@@ -93,7 +98,7 @@ mcmanage(){
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 HOSTS ADD $4 $5 ${HOSTNAME}"		
 				;;
 			"MAC"|"LINUX")
-				if [[ $(ssh ${USERNAME}@${MCHOST} "cat /etc/hosts|grep -c -e \"\t$4\t\"") -ne 0 ]]
+				if [[ $(ssh ${USERNAME}@${MCHOST} "cat /etc/hosts|grep -c -e \" $4 #${DHOSTNAME}#\"") -ne 0 ]]
 				then
 					# Cannot sed -i so copy hosts, amend, copy back
 					scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
@@ -101,7 +106,7 @@ mcmanage(){
 					scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
 					rm /tmp/hosts
 				fi
-				ssh ${USERNAME}@${MCHOST} "echo \"$5 $4 #${HOSTNAME}#\" >> /etc/hosts"
+				ssh ${USERNAME}@${MCHOST} "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
 				;;
 			*)
 				log "mcmange unhandled - $1,$2,$3,$4,$5,$6,$7,$8"
@@ -115,7 +120,7 @@ mcmanage(){
 				;;
 			"MAC"|"LINUX")
 				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
-			        sed -i "/ $6 /d" /tmp/hosts
+			        sed -i "/ $5 #${DHOSTNAME}#/d" /tmp/hosts
 				scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
 				rm /tmp/hosts
 				;;

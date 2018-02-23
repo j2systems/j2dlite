@@ -29,11 +29,11 @@ function onOpen(evt)
 	myip = document.getElementById("IP").value;
 	doSend("checkclient=" + myip);
 	createTable("advanced");
-	createRow("advanced","advanced-table","")
+	createRow("advanced","advanced-table","");
 	createSeperator("advanced","green");
 	createTable("submenu");
-	createRow("submenu","submenu-table","")
-	doSend("advancedbuttons");
+	createRow("submenu","submenu-table","");
+	//doSend("advancedbuttons");
 }
 
 function onClose(evt)
@@ -318,8 +318,11 @@ function doRestart()
 function onMessage(evt)
 {
 	var thismessage=evt.data.split(",")
-//window.alert(thismessage);
 	var category=thismessage[0];
+	if (category.indexOf("=") > 0) {
+		doSend("advancedbuttons");
+		return;
+	}
 	if (thismessage[2] == "CONSOLE") {
 		doConsole(thismessage);
 	}else {

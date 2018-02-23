@@ -20,7 +20,7 @@ for REFERENCE in wsdetail_MClients wsdetail_MClients_declined
 do
 	if [[ ! -f ${SYSTEMPATH}/${REFERENCE} ]]
 	then
-		echo ${SYSTEMPATH}/${REFERENCE}
+		#echo ${SYSTEMPATH}/${REFERENCE}
 		touch ${SYSTEMPATH}/${REFERENCE}
 		chmod 666 ${SYSTEMPATH}/${REFERENCE}
 	fi
@@ -46,15 +46,17 @@ then
 					RHOSTNAME=$(echo "${RHOSTNAME}"|cut -d "." -f1)
 					if [[ "${RHOSTNAME}" != "" ]]                            
 					then    
-						KNOWNHOST=true                                  
+						KNOWNHOST=true
+						write_global KNOWNHOST
 						#add_host ${CHECKHOSTIP} ${RHOSTNAME}
-						ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
+						#ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
 						mcmanage ${RHOSTNAME} hosts remove ${HOSTNAME}
 						mcmanage ${RHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 					fi
 				fi                                                      
 			fi                                                              
-		done 3<${SYSTEMPATH}/wsdetail_MClients                         
+		done 3<${SYSTEMPATH}/wsdetail_MClients
+		. ${TMPPATH}/globals
 		echo "mclient=${KNOWNHOST}"
 		log "client checked and returned  ${KNOWNHOST}" 
 	else
