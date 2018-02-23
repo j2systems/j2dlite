@@ -133,7 +133,7 @@ write_global SHAREDIR
 
 # keep system dir out of gits way
 
-mount --bind /mnt/sda1/system/ /var/www/cgi-bin/system
+mount --bind /${MOUNTDRIVE}/system/ /var/www/cgi-bin/system
 mkdir -p /etc/docker
 chmod 777 /etc/docker
 cp -f /var/www/cgi-bin/source/daemon.json /etc/docker/daemon.json
