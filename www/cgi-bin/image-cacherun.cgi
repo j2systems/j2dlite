@@ -1,18 +1,17 @@
 #!/bin/bash
 
-cat base/blankheader
+cat base/header
 source source/functions.sh 2>&1
 source source/filelist.sh 2>&1
 . tmp/globals
 THISROOT=$SHAREDIR
-#echo "Thisroot $THISROOT,$SHAREDIR"
 case "${REQUEST_METHOD}" in
 	"POST")
 		read INSTRUCTION
 		CURRENTPATH=$(echo $INSTRUCTION|cut -d "&" -f1)
 		INFO=$(echo $INSTRUCTION|cut -d "&" -f2)
 		TYPE=$(echo $INFO|cut -d "=" -f1)
-		VALUE=$(echo $INFO|cut -d "=" -f2tr "+" " ")
+		VALUE=$(echo $INFO|cut -d "=" -f2|tr "+" " ")
 		SUBMITTEDPATH=$(echo $CURRENTPATH|cut -d "=" -f2|sed "s,%2F,/,g")
 		#echo CP $CURRENTPATH,INF $INFO,TY $TYPE,VAL $VALUE,SUB $SUBMITTEDPATH
 		if [[ "$TYPE" == "dir" ]]
@@ -38,14 +37,17 @@ case "${REQUEST_METHOD}" in
 			echo "</table></form>"
 		else
 			echo "<table align=\"center\"><tr>"
-			echo "<td class=\"filelisting black\">Installer:</td>"
+			echo "<td class=\"filelisting black\">Exec Script:</td>"
 			echo "<td class=\"filelisting yellow\">$VALUE</td></tr>"
 			INSTALLERPATH=$SUBMITTEDPATH
 			INSTALLER=$VALUE
 			write_global INSTALLERPATH
 			write_global INSTALLER
+			 echo "<td><form action=\"./terminal.cgi\" method=\"POST\">"
+			echo "<input type=\"submit\" value=\"Run\" class=\"button green\"></form></td>"
 			echo "<td><form action=\"./image-cacherun.cgi\" method=\"GET\">"
 			echo "<input type=\"submit\" value=\"Cancel\" class=\"button gray\"></form></td></tr></table>"
+			
 		fi
         ;;
 	*)

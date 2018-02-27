@@ -434,7 +434,6 @@ function onMessage(evt)
 			case "CONTAINERDETAIL":
 				updateButtonRow(thismessage);
 				break;
-			
 			default:
 				//writeToStatus("Message: " + evt.data)
 		}

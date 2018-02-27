@@ -65,6 +65,10 @@ function controlContainer(dothis)
 			if (document.getElementById('ccon' + thiscontainer) != null) {
 				removeElement('ccon' + thiscontainer);
 			}
+		case "execscript":
+			doSend(dothis);
+			window.open("image-cacherun.cgi","_self");
+			break;
 		default:
 			//disableButtons(true);
 			doSend(dothis);
@@ -481,6 +485,10 @@ function onMessage(evt)
 		case "CONTAINERDETAIL":
 			updateButtonRow(thismessage);
 			break;
+		case "URL":
+			//window.alert(thismessage);
+			window.open("./" + thismessage[1]); 
+			break;  
 		default:
 			//writeToStatus("Message: " + evt.data)
 	}

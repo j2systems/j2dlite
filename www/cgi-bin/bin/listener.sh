@@ -139,6 +139,12 @@ do
 			log "${BINPATH}/${EXECSCRIPT},${EXECPARAM}"
 			bash ${BINPATH}/${EXECSCRIPT} "${EXECPARAM}" 
 			;;
+		"execscript")
+			log "execscript ${DETAIL}"
+			SCRIPTCONTAINER=${DETAIL}
+			write_global SCRIPTCONTAINER
+			#echo "URL,image-cacherun.cgi"
+			;;
 		*)
 			log "Received $DOTHIS, #$ACTION#"
 			#echo "RESEND $DOTHIS"
