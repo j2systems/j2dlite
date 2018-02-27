@@ -4,10 +4,13 @@
 
 . /var/www/cgi-bin/tmp/globals
 source ${SOURCEPATH}/functions.sh
-
-	docker cp ${INSTALLERPATH}/${INSTALLER} ${SCRIPTCONTAINER}:/tmp
+	INSTALLERPATH=$(echo ${INSTALLERPATH}|sed "s,/mnt/shared,/mnt/host,g")
+	echo "Copying ${INSTALLERPATH}/${INSTALLER} to /tmp"
+	docker exec ${SCRIPTCONTAINER} cp ${INSTALLERPATH}/${INSTALLER} /tmp
+	echo "Making script executable"
 	docker exec ${SCRIPTCONTAINER} chmod 777 /tmp/${INSTALLER}
-	docker exec ${SCRIPTCONTAINER} /bin/sh /tmp/${INSTALLER}
+	echo "Running script..."
+	docker exec ${SCRIPTCONTAINER} /bin/sh /tmp/${INSTALLER} 2>&1
 	echo "SCRIPT END"
 	delete_global SCRIPTCONTAINER
 	delete_global INSTALLER
