@@ -27,7 +27,7 @@ do
 done
 THISIFS=$IFS
 IFS=","
-
+REFRESH=false
 # check /etc/hosts
 if [[ $(grep -c -e "^${CHECKHOSTIP} " /etc/hosts) -eq 0 ]]
 then
@@ -45,9 +45,11 @@ then
  					RHOSTNAME=$(ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${CHECKHOSTIP} hostname 2>/dev/null|dos2unix)
 					RHOSTNAME=$(echo "${RHOSTNAME}"|cut -d "." -f1)
 					if [[ "${RHOSTNAME}" != "" ]]                            
-					then    
+					then
+						REFRESH=true    
 						KNOWNHOST=true
 						write_global KNOWNHOST
+						write_global REFRESH
 						add_host ${CHECKHOSTIP} ${RHOSTNAME}
 						ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
 						mcmanage ${RHOSTNAME} hosts remove ${HOSTNAME}
@@ -69,3 +71,6 @@ else
 fi
 IFS=$THISIFS
 #bash ${BINPATH}/dockerhub.sh
+. ${TMPPATH}/globals
+[[ "${REFRESH}" == "true" ]] && bash ${BINPATH}/mclientupdate.sh
+delete_global REFRESH
