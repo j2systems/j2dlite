@@ -65,6 +65,7 @@ function controlContainer(dothis)
 			if (document.getElementById('ccon' + thiscontainer) != null) {
 				removeElement('ccon' + thiscontainer);
 			}
+			doSend(dothis);
 			break;
 		case "execscript":
 			doSend(dothis);
