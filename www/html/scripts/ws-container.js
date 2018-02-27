@@ -67,7 +67,7 @@ function controlContainer(dothis)
 			}
 		case "execscript":
 			doSend(dothis);
-			window.open("image-cacherun.cgi","_self");
+			window.open("container-execscript.cgi","_self");
 			break;
 		default:
 			//disableButtons(true);

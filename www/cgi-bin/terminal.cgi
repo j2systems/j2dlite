@@ -33,6 +33,7 @@ read DETAIL
 [[ $(echo $DETAIL|grep -c "CACHEINST=") -eq 1 ]] && MODE="CACHEINST"
 [[ $(echo $DETAIL|grep -c "CACHERTN=") -eq 1 ]] && MODE="CACHERTN"
 [[ $(echo $DETAIL|grep -c "TERMINAL=") -eq 1 ]] && MODE="TERMINAL"
+[[ $(echo $DETAIL|grep -c "EXECSCRIPT=") -eq 1 ]] && MODE="EXECSCRIPT"
 if [[ "$MODE" != "unknown" ]]
 then
 		echo "<table width=\"100%\"  align=\"center\">"
@@ -126,6 +127,10 @@ case "$MODE" in
 	"TERMINAL")
 		RETURNURL="system.cgi"
 	;;
+	"EXECSCRIPT")
+		OPERATION="interact=dockerexecscript.sh,"
+		RETURNURL="container-control.cgi"
+		;;
 	*)
 		echo "Need to handle $DETAIL"
 	;;
