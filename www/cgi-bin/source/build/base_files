@@ -4,3 +4,4 @@ healthshare /etc/init.d
 telnetd /sbin/
 pseudo-init /sbin/
 isc_auto_install.sh /tmp
+manage_journals.sh /sbin

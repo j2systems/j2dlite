@@ -8,6 +8,11 @@ source ${SOURCEPATH}/functions.sh
 #	Stop
 	delete_global JOBSTATUS
  	log "docker stop ${STOPCONTAINER}" 
+	if [[ "$(isHS ${STOPCONTAINER})" == "true" ]]
+	then
+		# purge and move journals
+		docker exec ${STOPCONTAINER} /bin/sh /sbin/manage_journals.sh 2>&1 
+	fi
 	docker stop ${STOPCONTAINER} 2>&1 
 	bash ${BINPATH}/mclientupdate.sh
 #	bash ${BINPATH}/docker-volprune.sh

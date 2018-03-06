@@ -42,7 +42,7 @@ then
 			then
 				if [[ "${TYPE}" == "${MANHOSTTYPE}" ]]
 				then
- 					RHOSTNAME=$(ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${CHECKHOSTIP} hostname 2>/dev/null|dos2unix)
+ 					RHOSTNAME=$(ssh ${USERNAME}@${CHECKHOSTIP} hostname 2>/dev/null|dos2unix)
 					RHOSTNAME=$(echo "${RHOSTNAME}"|cut -d "." -f1)
 					if [[ "${RHOSTNAME}" != "" ]]                            
 					then
@@ -51,8 +51,7 @@ then
 						write_global KNOWNHOST
 						write_global REFRESH
 						add_host ${CHECKHOSTIP} ${RHOSTNAME}
-						ssh -o StrictHostKeyChecking=no -o PreferredAuthentications=publickey ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
-						mcmanage ${RHOSTNAME} hosts remove ${HOSTNAME}
+						ssh ${USERNAME}@${RHOSTNAME} hostname 2>/dev/null
 						mcmanage ${RHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 					fi
 				fi                                                      

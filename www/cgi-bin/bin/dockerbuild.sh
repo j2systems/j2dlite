@@ -38,6 +38,7 @@ BUILDDIR=${WWWROOT}/build
 	echo "Running install..."
 	docker exec ${BUILDNAME} /bin/sh /tmp/isc_auto_install.sh 2>&1
 	echo "Cleaning up ..."
+	docker exec ${BUILDNAME} /bin/sh /sbin/manage_journals.sh 2>&1
 	echo "Stopping instance, removing install and commiting"
 	docker stop ${BUILDNAME} 2>&1 1> /dev/null
 	docker commit --change='ENTRYPOINT ["/sbin/pseudo-init"]' ${BUILDNAME} j2systems/docker:HS${BUILDNAME} 2>&1
@@ -45,4 +46,4 @@ BUILDDIR=${WWWROOT}/build
 	docker rm ${BUILDNAME}
 	echo "Process complete"
 	echo "SCRIPT END"
-		
+

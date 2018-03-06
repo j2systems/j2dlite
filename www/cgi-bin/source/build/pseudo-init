@@ -2,6 +2,11 @@
 
 start() {
   echo "`date` startup begun" >>/tmp/pseudo-init.log
+  if [[ "$(ls /InterSystems/jrnpri)" == "" ]]
+  then
+	find /InterSystems/hs/mgr/journal/jrnpri/ -type f -exec mv {} /InterSystems/jrnpri/ \; 
+	find /InterSystems/hs/mgr/journal/jrnalt/ -type f -exec mv {} /InterSystems/jrnalt/ \; 
+  fi 
   /etc/init.d/ISCAgent start
   /usr/sbin/httpd -k start
   ccontrol start hs

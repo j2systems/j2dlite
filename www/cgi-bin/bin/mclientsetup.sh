@@ -16,12 +16,12 @@ echo "Add integrated client."
 echo "This will add an RSA certificate to the \"authorized_keys\" file"
 echo "in the users .ssh directory on ${MCHOSTIP}."
 echo 
-if [[ "$(sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} echo ok)" == "ok" ]]
+if [[ "$(sshpass -p ${MCPASSWORD} ssh ${MCUSERNAME}@${MCHOSTIP} echo ok)" == "ok" ]]
 then
-	if [[ "$(sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} ls .ssh)" == "" ]]
+	if [[ "$(sshpass -p ${MCPASSWORD} ${MCUSERNAME}@${MCHOSTIP} ls .ssh)" == "" ]]
 	then
-		sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} mkdir .ssh
-		sshpass -p ${MCPASSWORD} ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${MCHOSTIP} chmod 700 .ssh
+		sshpass -p ${MCPASSWORD} ssh ${MCUSERNAME}@${MCHOSTIP} mkdir .ssh
+		sshpass -p ${MCPASSWORD} ssh ${MCUSERNAME}@${MCHOSTIP} chmod 700 .ssh
 	else
 		sshpass -p ${MCPASSWORD} rsync ${MCUSERNAME}@${MCHOSTIP}:.ssh/authorized_keys /tmp/authorized_keys
 	fi 
@@ -39,13 +39,15 @@ then
 		echo "Adding ${MCHOSTIP} to integrated clients list."
 		sed  -i "/${NEWHOSTNAME}/d" ${SYSTEMPATH}/wsdetail_MClients 
 		add_host ${MCHOSTIP} ${NEWHOSTNAME}
-		ssh -o StrictHostKeyChecking=no ${MCUSERNAME}@${NEWHOSTNAME} hostname
+		ssh ${MCUSERNAME}@${NEWHOSTNAME} hostname
 		echo "${NEWHOSTNAME},${MCUSERNAME},${MCHOSTTYPE},true,${MCSTUDIO},${MCATELIER}" >> ${SYSTEMPATH}/wsdetail_MClients
 		if [[ "${MCHOSTTYPE}" == "WINDOWS" ]]
 		then
 			echo "Transferring management script"
 			rsync ${BINPATH}/clients/* ${MCUSERNAME}@${NEWHOSTNAME}:
 		fi
+		# enable powershell
+		ssh ${MCUSERNAME}@${NEWHOSTNAME} 'powershell -c "set-enexecutionpolicy unrestricted"'
 		echo "Adding hosts entry"
 		mcmanage ${NEWHOSTNAME} hosts add ${HOSTNAME} ${HOSTIP}
 		rm -rf /tmp/authorized_keys

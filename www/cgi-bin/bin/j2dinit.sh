@@ -187,6 +187,11 @@ ln -s /usr/local/etc/ssl/certs /etc/ssl
 #Start websocket, job listener, apache, zfs and docker 
 echo "Starting interaction services"                             
 nohup /var/www/cgi-bin/bin/init.sh >> /var/log/system.log & 
-bash ${BINPATH}/dockerhub.sh
+bash ${BINPATH}/dockerhub.sh &
+echo "Please point your browser to"
 echo "http://${HOSTIP}/"
+echo
+echo "or"
+echo
+echo "ssh tc@${HOSTIP}"
 

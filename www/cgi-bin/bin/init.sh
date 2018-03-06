@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# Red globals to get sytem directories
+# Read globals to get sytem directories
 
 WWWROOT=/var/www/cgi-bin
 TMPPATH=${WWWROOT}/tmp
 . ${TMPPATH}/globals
+
+# Disable ssh host checking
+echo -e "Host *\nStrictHostKeyChecking no" > /root/.ssh/config
 
 #Websocket
 websocketd --port 4201 ${BINPATH}/listener.sh &

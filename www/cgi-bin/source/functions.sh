@@ -101,12 +101,8 @@ mcmanage(){
 				log "$4 #${DHOSTNAME}#"
 				if [[ $(ssh ${USERNAME}@${MCHOST} "cat /etc/hosts|grep -c -e \" $4 #${DHOSTNAME}#\"") -ne 0 ]]
 				then
-					log "remove"
-					# Cannot sed -i so copy hosts, amend, copy back
-					#scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
-					sed -i "" "/$4 #/d" /tmp/hosts
-					#scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
-					#rm /tmp/hosts
+					log "remove $4 #${DHOSTNAME}#"
+					ssh ${USERNAME}@${MCHOST} "sed -i \"\" \"/$4 #${DHOSTNAME}#/d\" /etc/hosts"
 				fi
 				log "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
 				ssh ${USERNAME}@${MCHOST} "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
@@ -122,10 +118,10 @@ mcmanage(){
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 HOSTS REMOVE $4"			
 				;;
 			"MAC"|"LINUX")
-				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
+				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp/hosts >/dev/null
 			        sed -i "/ $5 #${DHOSTNAME}#/d" /tmp/hosts
 				scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
-				rm /tmp/hosts
+				#rm /tmp/hosts
 				;;
 			*)
 				log "mcmanage unhandled - $1,$2,$3,$4,$5,$6,$7,$8" 
@@ -138,7 +134,7 @@ mcmanage(){
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 HOSTS PURGE ${HOSTNAME}"
 				;;
 			"MAC"|"LINUX")
-				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp >/dev/null
+				scp ${USERNAME}@${MCHOST}:/etc/hosts /tmp/hosts >/dev/null
 				sed -i "/#${HOSTNAME}#$/d" /tmp/hosts
 				scp /tmp/hosts ${USERNAME}@${MCHOST}:/etc/hosts >/dev/null
 				rm /tmp/hosts

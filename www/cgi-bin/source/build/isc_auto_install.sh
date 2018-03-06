@@ -15,9 +15,10 @@ export ISC_PACKAGE_CSP_SERVERTYPE="Apache"
 export ISC_PACKAGE_CSP_APACHE_CONF="/etc/httpd/conf.d/csp.conf"
 export ISC_PACKAGE_STARTCACHE="N"
 export ISC_INSTALLER_LOGFILE="/tmp/Installer.log" 
-/usr/sbin/adduser -r cacheusr
-echo cacheusr:$PASSWORD | /usr/sbin/chpasswd
+#/usr/sbin/adduser -r cacheusr
+#echo cacheusr:$PASSWORD | /usr/sbin/chpasswd
 /usr/sbin/groupadd -r cachegrp
+
 mkdir -p /InterSystems/db  /InterSystems/jrnalt /InterSystems/jrnpri
 chown cacheusr:cacheusr /InterSystems/db /InterSystems/jrnalt /InterSystems/jrnpri
 chmod 775 /InterSystems/db /InterSystems/jrnalt /InterSystems/jrnpri
@@ -32,6 +33,14 @@ echo -e "_SYSTEM\nj2andUtoo\nzn \"%SYS\" s SYSOBJ=##Class(Config.Journal).Open()
 echo -e "_SYSTEM\nj2andUtoo\nzn \"%SYS\" s SYSOBJ=##Class(Config.Journal).Open() s SYSOBJ.AlternateDirectory=\"/InterSystems/jrnalt\" s TranMode=\$\$SetTransactionMode^%apiOBJ(0) s tSC=SYSOBJ.%Save() w tSC\nh\n"|csession hs
 
 ccontrol stop $ISC_PACKAGE_INSTANCENAME quietly
+
+# move current journals back to main image
+mkdir -p ${CACHEDIR}/mgr/journal/jrnalt
+mkdir -p ${CACHEDIR}/mgr/journal/jrnpri
+# Move existing journals to jrnpri, to ready for image start
+
+find ${CACHEDIR}/mgr/journal/ -maxdepth 1 -mindepth 1 -type f -exec mv {} ${CACHEDIR}/mgr/journal/jrnpri/ \;
+
 rm -rf /tmp/build
 #chown cacheusr:cacheusr /InterSystems -R
 chmod 755 /etc/init.d/healthshare 
