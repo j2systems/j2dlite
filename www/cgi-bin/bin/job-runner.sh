@@ -35,6 +35,13 @@ do
 				else
 					echo "FAILED,${THISJOB}" > ${JOBSTATUSPATH}/${THISFILE}
 				fi
+				CONTAINERDIR=$(docker inspect --format='{{json .GraphDriver.Data.Mountpoint}}' ${CONTAINER})
+				log "Checking for existence of ${CONTAINERDIR}"
+				if [[ -d ${CONTAINERDIR} ]] 
+				then
+					rmdir ${CONTAINERDIR} 
+					log "${CONTAINERDIR} removed"
+				fi
 				;;
 			"delete")
 				docker rm ${CONTAINER}
