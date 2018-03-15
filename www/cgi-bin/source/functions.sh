@@ -79,7 +79,6 @@ mcmanage(){
 	[[ "${MCDETAIL}" == "" ]] && log "mcmanage failed to get ${MCHOST} details." && return 1
 	local USERNAME=$(echo "${MCDETAIL}"|cut -d "," -f 2)
 	local MCTYPE=$(echo "${MCDETAIL}"|cut -d "," -f 3)
-	log "${MCHOST} ${COMMAND} ${ACTION}, (${MCTYPE}), $4 $5 $6 $7"
 	if [[ "${HOSTNAME}" == "$4" ]] 
 	then
 		DHOSTNAME=${HOSTNAME}-admin
@@ -94,17 +93,13 @@ mcmanage(){
 			#Adds single host entry
 			case ${MCTYPE} in 
 			"WINDOWS")
-				log "${MCTYPE} HOSTS ADD $4 $5 ${HOSTNAME}"
 				ssh ${USERNAME}@${MCHOST} powershell /c "./j2dconfig.ps1 HOSTS ADD $4 $5 ${HOSTNAME}"		
 				;;
 			"MAC"|"LINUX")
-				log "$4 #${DHOSTNAME}#"
 				if [[ $(ssh ${USERNAME}@${MCHOST} "cat /etc/hosts|grep -c -e \" $4 #${DHOSTNAME}#\"") -ne 0 ]]
 				then
-					log "remove $4 #${DHOSTNAME}#"
 					ssh ${USERNAME}@${MCHOST} "sed -i \"\" \"/$4 #${DHOSTNAME}#/d\" /etc/hosts"
 				fi
-				log "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
 				ssh ${USERNAME}@${MCHOST} "echo \"$5 $4 #${DHOSTNAME}#\" >> /etc/hosts"
 				;;
 			*)

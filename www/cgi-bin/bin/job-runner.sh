@@ -28,19 +28,28 @@ do
 			"stop")
 				docker stop ${CONTAINER}
 				OUTCOME=$?
-				if [[ ${OUTCOME} -eq 0 ]]
-				then
-					${BINPATH}/mclientupdate.sh
-					echo "COMPLETE,${THISJOB}" > ${JOBSTATUSPATH}/${THISFILE}
-				else
-					echo "FAILED,${THISJOB}" > ${JOBSTATUSPATH}/${THISFILE}
-				fi
+				[[ ${OUTCOME} -eq 0 ]] && ${BINPATH}/mclientupdate.sh
 				CONTAINERDIR=$(docker inspect --format='{{json .GraphDriver.Data.Mountpoint}}' ${CONTAINER})
-				log "Checking for existence of ${CONTAINERDIR}"
+				log "Checking for clean stop of ${CONTAINER}"
 				if [[ -d ${CONTAINERDIR} ]] 
 				then
-					rmdir ${CONTAINERDIR} 
-					log "${CONTAINERDIR} removed"
+					if [[ -z "$(ls -A ${CONTAINERDIR})" ]]
+					then
+						log "Removing ${CONTAINERDIR}"
+						rmdir ${CONTAINERDIR} 
+					fi
+				fi
+				if [[ -d ${CONTAINERDIR} ]] 
+				then
+					echo "FAILED,${THISJOB}" > ${JOBSTATUSPATH}/${THISFILE} 
+					log "There seems to be a problem with ${CONTAINER}"
+					log "It's container directory,"
+					log "${CONTAINERDIR}"
+					log "is not empty, but needs to be removed for further functionality"
+				else
+					echo "COMPLETE,${THISJOB}" > ${JOBSTATUSPATH}/${THISFILE}
+					log "${CONTAINER} stopped cleanly."
+
 				fi
 				;;
 			"delete")

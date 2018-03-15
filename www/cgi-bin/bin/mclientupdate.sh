@@ -26,12 +26,11 @@ if [[ "${SOMETHINGTODO}" == "true" ]]
 then
 	while read -u3 MCHOST USERNAME TYPE INTEGRATE STUDIO ATELIER
 	do
-		log "Read ${MCHOST}, ${INTEGRATE}"
 		if [[ "${INTEGRATE}" == "true" ]]
 		then
 			if [[ "$(client_status ${MCHOST})" == "online" ]]
 			then
-				log "${MCHOST} at update"
+				log "Updating ${MCHOST}"
 				#update routing
 				mcmanage ${MCHOST} route check
 				#purge hosts
