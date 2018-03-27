@@ -16,9 +16,10 @@ then
 	#echo $DETAIL
 	IMAGENAME=$(echo ${DETAIL}|cut -d "&" -f1|cut -d "=" -f1|sed "s,_FSLASH_,/,g"|sed "s,_COLON_,:,g")
        	HOST=$(echo ${DETAIL}|cut -d "&" -f1|cut -d "=" -f2)
-	CUSTOMCOMMAND=$(echo ${DETAIL}|cut -d "&" -f2|cut -d "=" -f2|sed "s,+, ,g"|sed "s,%22,\\\",g"|sed "s,%3D,=,g"|sed "s,%26,\&,g"|sed "s,%27,\',g"|sed "s,%2B,+,g"|sed "s,%2F,/,g"|sed "s,%40,\@,g")
-	ENTRYPOINT=$(echo ${DETAIL}|cut -d "&" -f3|cut -d "=" -f2|sed "s,+, ,g"|sed "s,%22,\",g"|sed "s,%3D,=,g"|sed "s,%26,\&,g"|sed "s,%27,\',g"|sed "s,%2B,+,g"|sed "s,%2F,/,g"|sed "s,%40,\@,g")
-	echo "Custom command: ${CUSTOMCOMMAND}"
+	CUSTOMCOMMAND=$(decodeURL $(echo ${DETAIL}|cut -d "&" -f2|cut -d "=" -f2))
+	ENTRYPOINT=$(decodeURL $(echo ${DETAIL}|cut -d "&" -f3|cut -d "=" -f2))
+
+	echo "Custom command: ${CUSTOMCOMMAND}, entrypoint: ${ENTRYPOINT}"
 	#add new hostname to global 
 	echo "Spinning up $HOST"
 	. ${TMPPATH}/globals
@@ -26,15 +27,15 @@ then
 	if [[ "${ENTRYPOINT}" == "" || "${ENTRYPOINT}" == "null" ]]
 	then
 		echo "docker run -id --name ${HOST} -h ${HOST}  --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} /bin/sh"
-		docker run -itd --name ${HOST} -h ${HOST}  --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} /bin/sh 2>&1
+		docker run -id --name ${HOST} -h ${HOST}  --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} /bin/sh 2>&1
 	else
 		if [[ "${ENTRYPOINT}" == "/sbin/pseudo-init" ]]
 			then
 				echo "docker run -d --name ${HOST} -h ${HOST} --network j2docker -v ${SHAREDIR}:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri ${CUSTOMCOMMAND} ${IMAGENAME}"
 				docker run -d --name ${HOST} -h ${HOST} --network j2docker -v ${SHAREDIR}:/mnt/host -v /InterSystems/jrnalt -v  /InterSystems/jrnpri ${CUSTOMCOMMAND} ${IMAGENAME} 2>&1
 			else
-				echo "docker run -d --name ${HOST} -h ${HOST} --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} ${ENTRYPOINT}"
-				docker run -d --name ${HOST} -h ${HOST} --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} ${ENTRYPOINT}
+				echo "docker run -id --name ${HOST} -h ${HOST} --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} ${ENTRYPOINT}"
+				docker run -id --name ${HOST} -h ${HOST} --network j2docker -v ${SHAREDIR}:/mnt/host ${CUSTOMCOMMAND} ${IMAGENAME} ${ENTRYPOINT}
 			fi
 		fi
 	fi	

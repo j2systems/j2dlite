@@ -41,6 +41,16 @@ BUILDDIR=${WWWROOT}/build
 	docker exec ${BUILDNAME} /bin/sh /sbin/manage_journals.sh 2>&1
 	echo "Stopping instance, removing install and commiting"
 	docker stop ${BUILDNAME} 2>&1 1> /dev/null
+	CONTAINERDIR=$(docker inspect --format='{{json .GraphDriver.Data.Mountpoint}}' ${BUILDNAME})
+	log "Checking for clean stop of build ${BUILDNAME}"
+	if [[ -d ${CONTAINERDIR} ]]
+	then
+		if [[ -z "$(ls -A ${CONTAINERDIR})" ]]
+		then
+			log "Removing build directory ${CONTAINERDIR}"
+			rmdir ${CONTAINERDIR}
+		fi
+	fi
 	docker commit --change='ENTRYPOINT ["/sbin/pseudo-init"]' ${BUILDNAME} j2systems/docker:HS${BUILDNAME} 2>&1
 	echo "Removing intermediary container"
 	docker rm ${BUILDNAME}

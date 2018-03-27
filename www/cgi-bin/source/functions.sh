@@ -449,7 +449,7 @@ isRDP(){
 # 3.3 Strip % special characters
 
 decodeURL() {
-	printf "$(echo $1|sed 's/+/ /g;s/%\(..\)/\\x\1/g;')";
+	echo "$1"|sed 's@+@ @g;s@%@\\x@g'|xargs -0 printf "%b"
 }
 
 ################################################################################
