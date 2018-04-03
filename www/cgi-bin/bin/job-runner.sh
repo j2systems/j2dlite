@@ -29,14 +29,16 @@ do
 				docker stop ${CONTAINER}
 				OUTCOME=$?
 				[[ ${OUTCOME} -eq 0 ]] && ${BINPATH}/mclientupdate.sh
-				CONTAINERDIR=$(docker inspect --format='{{json .GraphDriver.Data.Mountpoint}}' ${CONTAINER})
+				CONTAINERDIR=$(docker inspect --format='{{json .GraphDriver.Data.Mountpoint}}' ${CONTAINER}|tr -d "\"")
 				log "Checking for clean stop of ${CONTAINER}"
 				if [[ -d ${CONTAINERDIR} ]] 
 				then
 					if [[ -z "$(ls -A ${CONTAINERDIR})" ]]
 					then
 						log "Removing ${CONTAINERDIR}"
-						rmdir ${CONTAINERDIR} 
+						rm -rf ${CONTAINERDIR}
+					else
+						log "${CONTAINERDIR} not empty"
 					fi
 				fi
 				if [[ -d ${CONTAINERDIR} ]] 
@@ -48,8 +50,7 @@ do
 					log "is not empty, but needs to be removed for further functionality"
 				else
 					echo "COMPLETE,${THISJOB}" > ${JOBSTATUSPATH}/${THISFILE}
-					log "${CONTAINER} stopped cleanly."
-
+					log "${CONTAINER} stopped.  Running folder clean."
 				fi
 				;;
 			"delete")
